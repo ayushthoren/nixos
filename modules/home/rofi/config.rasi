@@ -1,0 +1,133 @@
+configuration {
+    modes: "drun,run,window";
+/*    show-icons: true;*/
+    display-drun: "Apps";
+    display-run: "Run";
+    display-window: "Windows";
+    drun-display-format: "{name}";
+    window-format: "{w} · {c} · {t}";
+    separator-style: none;
+
+    timeout {
+        action: "kb-cancel";
+        delay:  0;
+    }
+    filebrowser {
+        directories-first: true;
+        sorting-method: "name";
+    }
+}
+
+* {
+    font: "Noto Sans 11";
+    background-color: transparent;
+    text-color: @normal-text;
+}
+
+/*****----- Main Window -----*****/
+window {
+    transparency: "real";
+    location: center;
+    anchor: center;
+    width: 550px;
+    border: 2px solid;
+    border-radius: 12px;
+    border-color: @window-border;
+    background-color: @window-background;
+    padding: 0px;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    spacing: 0px;
+    padding: 12px;
+    background-color: transparent;
+    children: [ "inputbar", "listview" ];
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    spacing: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: @prompt-background;
+    text-color: @prompt-text;
+    margin: 0px 0px 8px 0px;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    background-color: inherit;
+    text-color: @window-border;
+    font: "Noto Sans Bold 11";
+}
+
+entry {
+    background-color: inherit;
+    text-color: inherit;
+    cursor: text;
+    placeholder: "Search...";
+    placeholder-color: @normal-text;
+}
+
+/*****----- Listview -----*****/
+listview {
+    columns: 1;
+    lines: 8;
+    cycle: true;
+    scrollbar: true;
+    spacing: 4px;
+    background-color: transparent;
+    text-color: @normal-text;
+}
+
+scrollbar {
+    handle-width: 4px;
+    handle-color: @scrollbar-filled;
+    background-color: @scrollbar-empty;
+    border-radius: 8px;
+    margin: 0px 0px 0px 4px;
+}
+
+/*****----- Elements -----*****/
+element {
+    spacing: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background-color: transparent;
+    text-color: @normal-text;
+    cursor: pointer;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+    text-color: @normal-text;
+}
+
+element selected.normal,
+element alternate.selected {
+    background-color: @selected-background;
+    text-color: @selected-text;
+}
+
+element-icon {
+    size: 32px;
+    background-color: transparent;
+    cursor: inherit;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+    cursor: inherit;
+}
+
+@import "~/.cache/wallust/colors-rofi.rasi"
+
+/* Remove the dashed separator */
+mainbox   { border: 0; }
+listview  { border: 0; padding: 0; }
+message   { border: 0; }
+textbox   { border: 0; }

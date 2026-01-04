@@ -1,0 +1,22 @@
+From 52b7b439d9ab11adeb683889623654d2e439a9f0 Mon Sep 17 00:00:00 2001
+From: Ayush Thoren <ayushthoren@gmail.com>
+Date: Sat, 15 Nov 2025 20:02:01 -0800
+Subject: [PATCH] Fix OSError not being caught when config file is read-only
+
+---
+ waypaper/config.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/waypaper/config.py b/waypaper/config.py
+index 8ee322e..ff017b9 100644
+--- a/waypaper/config.py
++++ b/waypaper/config.py
+@@ -256,7 +256,7 @@ def save(self, only_state=False) -> None:
+         try:
+             with open(self.config_file, "w") as configfile:
+                 config.write(configfile)
+-        except PermissionError:
++        except (PermissionError, OSError):
+             print("Could not save config file due to permission error.")
+ 
+         # If requested, save the state file:

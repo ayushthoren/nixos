@@ -1,0 +1,17 @@
+backend = "fastresize"
+color_space = "lch"
+palette = "dark"
+
+[templates]
+rofi.template = 'colors-rofi.rasi'
+rofi.target = '~/.cache/wallust/colors-rofi.rasi'
+waybar.template = 'colors-waybar.css'
+waybar.target = '~/.cache/wallust/colors-waybar.css'
+swayosd.template = 'colors-swayosd.css'
+swayosd.target = '~/.cache/wallust/colors-swayosd.css'
+hypr.template = 'colors-hypr.conf'
+hypr.target = '~/.cache/wallust/colors-hypr.conf'
+kitty.template = 'colors-kitty.conf'
+kitty.target = '~/.cache/wallust/colors-kitty.conf'
+nixoslogo.template = 'colors-nixoslogo.svg'
+nixoslogo.target = '~/.cache/wallust/colors-nixoslogo.svg'

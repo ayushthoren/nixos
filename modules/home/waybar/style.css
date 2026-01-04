@@ -1,0 +1,96 @@
+@import '../../.cache/wallust/colors-waybar.css';
+
+* {
+    font-family: "Arimo Nerd Font Propo";
+    font-size: 14px;
+    font-weight: normal;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    margin-bottom: -1.75;
+    padding: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: @color7;
+    padding: 0;
+    margin: 0;
+}
+
+#workspaces {
+    margin: 0 8px;
+    padding: 0;
+}
+
+#workspaces button {
+    padding: 5px 8px;
+    background: transparent;
+    color: @color7;
+    margin: 0 2px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    color: @color7;
+    font-weight: bold;
+}
+
+#workspaces button:hover {
+    color: @color7;
+    opacity: 0.7;
+}
+
+#workspaces button.urgent {
+    color: @color7;
+    text-decoration: underline;
+}
+
+#window,
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#custom-media,
+#tray,
+#idle_inhibitor,
+#custom-power {
+    padding: 0 6px 0 6px;
+    margin: 0;
+    background: transparent;
+    color: @color7;
+    /* border-bottom: 1px solid @color7; */
+}
+
+#network,
+#pulseaudio {
+    padding: 0 8px 0 8px;
+}
+
+#network {
+    /* margin-right: 4px; */
+    /* font-size: 15px; */
+}
+
+#pulseaudio {
+    font-size: 15px;
+}
+
+#custom-power {
+    margin-right: 8px;
+}
+
+label:focus {
+    background-color: transparent;
+}
+
+tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid @color7;
+    border-radius: 6px;
+    color: @color7;
+}
