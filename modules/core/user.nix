@@ -73,6 +73,7 @@
         vesktop
         qbittorrent
         protonvpn-gui
+        google-chrome
         
         # Games
         prismlauncher

@@ -42,7 +42,7 @@ mainbox {
     spacing: 0px;
     padding: 12px;
     background-color: transparent;
-    children: [ "inputbar", "listview" ];
+    children: [ "inputbar", "message", "listview" ];
 }
 
 /*****----- Inputbar -----*****/
@@ -124,10 +124,20 @@ element-text {
     cursor: inherit;
 }
 
+/*****----- Message -----*****/
+textbox {
+    padding: 10px 12px;
+    margin: 0px 0px 8px 0px;
+    border: 0;
+    border-radius: 6px;
+    background-color: @prompt-background;
+    text-color: @normal-text;
+    vertical-align: 0.5;
+}
+
 @import "~/.cache/wallust/colors-rofi.rasi"
 
 /* Remove the dashed separator */
 mainbox   { border: 0; }
 listview  { border: 0; padding: 0; }
 message   { border: 0; }
-textbox   { border: 0; }
