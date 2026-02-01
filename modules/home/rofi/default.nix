@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   home.packages = [
     (pkgs.rofi.override {
@@ -8,5 +8,5 @@
     })
   ];
 
-  xdg.configFile."rofi/config.rasi".source = ./config.rasi;
+  xdg.configFile."rofi/config.rasi".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/rofi/config.rasi";
 }

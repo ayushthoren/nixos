@@ -19,18 +19,17 @@
 
     # Only create performance.conf if performance mode is enabled
     xdg.configFile."hypr/performance.conf" = lib.mkIf config.hyprland.performanceMode {
-      source = ./performance.conf;
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/hyprland/performance.conf";
     };
 
-    # Copy hyprland.conf and optionally append performance.conf source line
-    xdg.configFile."hypr/hyprland.conf".text = 
-      let
-        baseConfig = builtins.readFile ./hyprland.conf;
-        performanceImport = "\nsource = ~/.config/hypr/performance.conf";
-      in
+    # Imports file that conditionally sources performance.conf
+    xdg.configFile."hypr/imports.conf".text = 
       if config.hyprland.performanceMode
-      then baseConfig + performanceImport
-      else baseConfig;
+      then "source = ~/.config/hypr/performance.conf"
+      else "# Performance mode disabled";
+
+    # Use symlink for hyprland.conf
+    xdg.configFile."hypr/hyprland.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/hyprland/hyprland.conf";
     
     # --------------------------------------------------
     

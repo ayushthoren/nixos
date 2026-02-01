@@ -17,8 +17,8 @@
     };
 
     initContent = ''
-      [[ ! -f ${./p10k.zsh} ]] || source ${./p10k.zsh}
-      if [[ $- == *i* ]]; then
+      [[ ! -f ${config.home.homeDirectory}/nixos/modules/home/zsh/p10k.zsh ]] || source ${config.home.homeDirectory}/nixos/modules/home/zsh/p10k.zsh
+      if [[ $- == *i* && "$TERM" == "xterm-kitty" ]]; then
         fastfetch
       fi
     '';

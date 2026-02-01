@@ -10,7 +10,7 @@ I use [Hyprland](https://hypr.land/) as my window manager. If you use this flake
 
 # Usage
 
-When you `git clone` this repo, do so in your home directory, such that your config directory becomes `~/nixos` rather than `/etc/nixos`. This will allow you have full write permissions so you can easily edit the files without needing to authenticate for every little thing, and it also ensures support for the command aliases used for building/updating/cleaning the system.
+When you `git clone` this repo, do so in your home directory, such that your config directory becomes `~/nixos` rather than `/etc/nixos`. This will allow you have full write permissions so you can easily edit the files without needing to authenticate for every little thing. It also ensures support for the command aliases used for building/updating/cleaning the system, as well as the config symlink system.
 
 When building the system for the first time, `cd` into the repo directory and use the following command, replacing `your-host` with the name of the host configuration you wish to use (like `desktop` or `hybrid-laptop`).
 ```
