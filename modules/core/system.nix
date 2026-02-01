@@ -1,13 +1,25 @@
 # Miscellaneous system configurations
 { pkgs, inputs, username, ... }:
 {
-  nix.extraOptions = ''
-    keep-outputs = true
-    keep-derivations = true
-  '';
-
-  # Add user to trusted users for using additional binary caches
-  nix.settings.trusted-users = [ "root" "@wheel" username ];
+  nix = {
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = [ "nix-command" "flakes" ];
+      trusted-users = [ "root" "@wheel" username ];
+      substituters = [
+        "https://hyprland.cachix.org"
+        "https://nix-community.cachix.org"
+      ];
+      trusted-public-keys = [
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
+    };
+    extraOptions = ''
+      keep-outputs = true
+      keep-derivations = true
+    '';
+  };
 
   security.polkit.enable = true;
 
@@ -39,9 +51,12 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    brightnessctl
+    playerctl
     efibootmgr
     lshw
     git
+    wget
   ];
 
   system.stateVersion = "25.05";

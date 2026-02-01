@@ -44,8 +44,6 @@
 
       home.packages = with pkgs; [
         # System utilities
-        brightnessctl
-        playerctl
         htop
         unzip
         nh
@@ -93,6 +91,8 @@
           "video/mp4" = [ "vlc.desktop" ];
           "video/x-matroska" = [ "vlc.desktop" ];
           "application/pdf" = [ "okular.desktop" ];
+          "x-scheme-handler/https" = [ "firefox.desktop" ];
+          "x-scheme-handler/http" = [ "firefox.desktop" ];
         };
       };
 

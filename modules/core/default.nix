@@ -1,7 +1,5 @@
 { inputs, ... }:
 {
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
   imports = [
     inputs.nix-flatpak.nixosModules.nix-flatpak
     ./audio.nix
