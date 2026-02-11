@@ -10,6 +10,7 @@
     ./rofi
     ./swayosd
     ./wallust
+    ./wlogout
     ./zsh
   ];
 }

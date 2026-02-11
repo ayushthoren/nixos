@@ -5,5 +5,4 @@
 
   xdg.configFile."waybar/config.jsonc".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/waybar/config.jsonc";
   xdg.configFile."waybar/style.css".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/waybar/style.css";
-  xdg.configFile."waybar/power_menu.xml".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/waybar/power_menu.xml";
 }

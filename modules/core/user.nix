@@ -55,6 +55,8 @@
         cowsay
         mesa-demos
         qdirstat
+        nmap
+        rclone
 
         # Wayland/Desktop utilities
         swaynotificationcenter
@@ -72,6 +74,7 @@
         qbittorrent
         protonvpn-gui
         google-chrome
+        obsidian
         
         # Games
         prismlauncher
