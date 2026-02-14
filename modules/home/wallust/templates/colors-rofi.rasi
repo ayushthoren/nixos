@@ -12,6 +12,7 @@
 
     window-border: {{color4}};
     window-background: {{background}};
+    window-background-translucent: {{background}}DD;
 
     scrollbar-filled: {{color4}};
     scrollbar-empty: {{color0}};

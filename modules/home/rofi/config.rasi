@@ -1,6 +1,6 @@
 configuration {
     modes: "drun,run,window";
-/*    show-icons: true;*/
+    show-icons: true;
     display-drun: "Apps";
     display-run: "Run";
     display-window: "Windows";
@@ -33,7 +33,7 @@ window {
     border: 2px solid;
     border-radius: 12px;
     border-color: @window-border;
-    background-color: @window-background;
+    background-color: @window-background-translucent;
     padding: 0px;
 }
 
@@ -73,9 +73,9 @@ entry {
 /*****----- Listview -----*****/
 listview {
     columns: 1;
-    lines: 8;
+    lines: 5;
     cycle: true;
-    scrollbar: true;
+    scrollbar: false;
     spacing: 4px;
     background-color: transparent;
     text-color: @normal-text;
@@ -115,6 +115,7 @@ element-icon {
     size: 32px;
     background-color: transparent;
     cursor: inherit;
+    tint: @window-border;
 }
 
 element-text {
