@@ -43,6 +43,16 @@
     enable32Bit = true;
   };
 
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
+
+  systemd.services.NetworkManager-wait-online.enable = false;
+
+  documentation.enable = false;
+
   # Register the flake in the system registry
   nix.registry.nixos.flake = inputs.self;
 

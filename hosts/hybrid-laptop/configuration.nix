@@ -21,10 +21,11 @@
   };
 
   # Graphics configuration
-  boot.kernelParams = [
-    "i915.enable_psr=0"
-    "i915.enable_psr2_sel_fetch=0"
-  ];
+  
+  # boot.kernelParams = [
+  #   "i915.enable_psr=0"
+  #   "i915.enable_psr2_sel_fetch=0"
+  # ];
 
   services.xserver.videoDrivers = [
     "modesetting"
@@ -62,7 +63,6 @@
   environment.variables = {
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     LIBVA_DRIVER_NAME = "nvidia";
-    NIXOS_OZONE_WL = "1";
   };
 
   environment.systemPackages = with pkgs; [
