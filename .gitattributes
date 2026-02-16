@@ -1,0 +1,3 @@
+flake.lock linguist-generated=true
+modules/home/zsh/p10k.zsh linguist-generated=true
+hosts/*/hardware-configuration.nix linguist-generated=true

@@ -1,5 +1,7 @@
 { pkgs, config, ... }:
 {
+  home.packages = [ pkgs.tirith ];
+
   programs.zsh = {
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";
@@ -18,8 +20,11 @@
 
     initContent = ''
       [[ ! -f ${config.home.homeDirectory}/nixos/modules/home/zsh/p10k.zsh ]] || source ${config.home.homeDirectory}/nixos/modules/home/zsh/p10k.zsh
-      if [[ $- == *i* && "$TERM" == "xterm-kitty" ]]; then
-        fastfetch
+      if [[ $- == *i* ]]; then
+        if [[ "$TERM" == "xterm-kitty" ]]; then
+          fastfetch
+        fi
+        eval "$(tirith init --shell zsh)"
       fi
     '';
     plugins = [

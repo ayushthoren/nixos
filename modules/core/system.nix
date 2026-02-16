@@ -51,7 +51,7 @@
 
   systemd.services.NetworkManager-wait-online.enable = false;
 
-  documentation.enable = false;
+  documentation.nixos.enable = false;
 
   # Register the flake in the system registry
   nix.registry.nixos.flake = inputs.self;

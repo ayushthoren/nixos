@@ -44,7 +44,7 @@
 
       home.packages = with pkgs; [
         # System utilities
-        htop
+        btop
         unzip
         nh
         librsvg
