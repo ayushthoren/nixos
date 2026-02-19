@@ -78,7 +78,6 @@
         
         # Games
         prismlauncher
-        lunar-client
       ];
 
       programs.firefox.enable = true; 

@@ -12,16 +12,7 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
-    # Pin aquamarine to commit before PR #239 to avoid multi-GPU crash (https://github.com/hyprwm/aquamarine/issues/246)
-    aquamarine = {
-      url = "github:hyprwm/aquamarine/b91f570bb7885df9e4a512d6e95a13960a5bdca0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    
-    hyprland = {
-      url = "github:hyprwm/Hyprland";
-      inputs.aquamarine.follows = "aquamarine";
-    };
+    hyprland.url = "github:hyprwm/Hyprland";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
