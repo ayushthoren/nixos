@@ -17,7 +17,7 @@
   
   environment.sessionVariables = {
     # Set environment variable to track flake config name
-    NIXOS_FLAKE_HOST = "hybrid-laptop";
+    NIXOS_FLAKE_HOST = "precision";
   };
 
   # Graphics configuration

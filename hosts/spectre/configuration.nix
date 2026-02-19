@@ -15,7 +15,7 @@
   
   # Set environment variable to track flake config name
   environment.sessionVariables = {
-    NIXOS_FLAKE_HOST = "old-laptop";
+    NIXOS_FLAKE_HOST = "spectre";
   };
 
   boot.loader = lib.mkForce {
