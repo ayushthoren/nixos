@@ -15,6 +15,10 @@
 
   programs.steam = { enable = true; };
 
+  # Ollama
+  services.ollama.enable = true;
+  services.open-webui.enable = true;
+
   # File manager
   programs.thunar.enable = true;
   programs.xfconf.enable = true;
@@ -40,6 +44,7 @@
         QT_QPA_PLATFORM = "wayland;xcb";
         QT_AUTO_SCREEN_SCALE_FACTOR = "1";
         QT_ENABLE_HIGHDPI_SCALING = "1";
+        NODE_EXTRA_CA_CERTS = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
       };
 
       home.packages = with pkgs; [
@@ -57,6 +62,8 @@
         qdirstat
         nmap
         rclone
+        winboat
+        podman-compose
 
         # Wayland/Desktop utilities
         swaynotificationcenter

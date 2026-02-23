@@ -6,6 +6,7 @@
     ./bootloader.nix
     ./locale.nix
     ./networking.nix
+    ./nvidia.nix
     ./overlays.nix
     ./system.nix
     ./user.nix

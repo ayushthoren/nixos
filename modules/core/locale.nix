@@ -1,6 +1,6 @@
 { ... }:
 {
-  time.timeZone = "America/Los_Angeles";
+  services.automatic-timezoned.enable = true;
 
   i18n = {
     defaultLocale = "en_US.UTF-8";

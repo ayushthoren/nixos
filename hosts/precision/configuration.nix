@@ -27,6 +27,8 @@
   #   "i915.enable_psr2_sel_fetch=0"
   # ];
 
+  nvidia.enable = true;
+
   services.xserver.videoDrivers = [
     "modesetting"
     "nvidia"
@@ -41,11 +43,8 @@
   ];
 
   hardware.nvidia = {
-    modesetting.enable = true;
-    open = true;
     powerManagement.enable = true;
     powerManagement.finegrained = true;
-    nvidiaSettings = true;
     # package = config.boot.kernelPackages.nvidiaPackages.beta;
 
     prime = {
