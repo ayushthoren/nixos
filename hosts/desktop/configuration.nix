@@ -21,6 +21,7 @@
   };
 
   nvidia.enable = true;
+  ollama.enable = true;
 
   services.xserver.videoDrivers = [ "nvidia" ];
 

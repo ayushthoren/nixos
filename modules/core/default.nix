@@ -7,6 +7,7 @@
     ./locale.nix
     ./networking.nix
     ./nvidia.nix
+    ./ollama.nix
     ./overlays.nix
     ./system.nix
     ./user.nix

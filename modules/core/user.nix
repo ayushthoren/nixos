@@ -15,10 +15,6 @@
 
   programs.steam = { enable = true; };
 
-  # Ollama
-  services.ollama.enable = true;
-  services.open-webui.enable = true;
-
   # File manager
   programs.thunar.enable = true;
   programs.xfconf.enable = true;

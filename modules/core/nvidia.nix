@@ -17,6 +17,6 @@ in
       nvidiaSettings = true;
     };
 
-    services.ollama.package = pkgs.ollama-cuda;
+    services.ollama.package = lib.mkIf config.ollama.enable pkgs.ollama-cuda;
   };
 }
