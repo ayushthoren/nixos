@@ -11,7 +11,7 @@
   config = {
     # Hyprland-related packages
     home.packages = with pkgs; [
-      swww           # Wallpaper daemon
+      awww           # Wallpaper daemon
       cliphist       # Clipboard manager
       wl-clipboard   # Wayland clipboard utilities
       hyprshot       # Screenshot tool for Hyprland

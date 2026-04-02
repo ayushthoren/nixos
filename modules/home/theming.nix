@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   dconf.settings = {
     "org/gnome/desktop/interface" = {
@@ -15,6 +15,7 @@
     cursorTheme = {
       name = "Breeze";
     };
+    gtk4.theme = config.gtk.theme;
   };
 
   qt = {

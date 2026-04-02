@@ -75,7 +75,7 @@
         spotify
         vesktop
         qbittorrent
-        protonvpn-gui
+        proton-vpn
         google-chrome
         obsidian
         

@@ -74,10 +74,14 @@
     playerctl
     efibootmgr
     lshw
-    git
     wget
     cacert
   ];
+
+  programs.git = {
+    enable = true;
+    lfs.enable = true;
+  };
 
   system.stateVersion = "25.05";
 }
