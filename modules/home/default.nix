@@ -4,6 +4,7 @@
     ./theming.nix
     ./kitty
     ./hyprland
+    ./hyprlock
     ./waybar
     ./waypaper
     ./fastfetch
