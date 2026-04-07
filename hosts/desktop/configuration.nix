@@ -20,6 +20,7 @@
     NIXOS_FLAKE_HOST = "desktop";
   };
 
+  cachyosKernel.enable = true;
   nvidia.enable = true;
   ollama.enable = true;
 

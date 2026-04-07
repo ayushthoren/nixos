@@ -18,6 +18,8 @@
     NIXOS_FLAKE_HOST = "spectre";
   };
 
+  cachyosKernel.enable = true;
+
   boot.loader = lib.mkForce {
     systemd-boot.enable = false;
     grub = {

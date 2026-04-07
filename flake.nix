@@ -21,6 +21,8 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
     mediaplayer.url = "./modules/home/waybar/mediaplayer";
   };
 

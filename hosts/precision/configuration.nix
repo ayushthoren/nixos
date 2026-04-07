@@ -27,6 +27,7 @@
   #   "i915.enable_psr2_sel_fetch=0"
   # ];
 
+  cachyosKernel.enable = true;
   nvidia.enable = true;
   ollama.enable = true;
 

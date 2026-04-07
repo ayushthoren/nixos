@@ -60,6 +60,7 @@
         rclone
         winboat
         podman-compose
+        geekbench
 
         # Wayland/Desktop utilities
         swaynotificationcenter
