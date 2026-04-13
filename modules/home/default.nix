@@ -13,5 +13,6 @@
     ./wallust
     ./wlogout
     ./zsh
+    ./firefox
   ];
 }

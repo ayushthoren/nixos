@@ -84,8 +84,6 @@
         prismlauncher
       ];
 
-      programs.firefox.enable = true; 
-
       # XDG default applications
       xdg = {
         enable = true;
