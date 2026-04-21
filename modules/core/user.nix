@@ -61,6 +61,8 @@
         winboat
         podman-compose
         geekbench
+        qemu
+        zip
 
         # Wayland/Desktop utilities
         swaynotificationcenter
@@ -79,6 +81,10 @@
         proton-vpn
         google-chrome
         obsidian
+        gimp
+        obs-studio
+        davinci-resolve
+        zoom-us
         
         # Games
         prismlauncher
