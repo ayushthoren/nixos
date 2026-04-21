@@ -68,7 +68,7 @@ get_available_hosts() {
     hosts=$(awk '
         /nixosConfigurations[[:space:]]*=[[:space:]]*\{/ { in_block=1; next }
         in_block && /^[[:space:]]*\}/ { in_block=0; next }
-        in_block && $1 ~ /^[a-zA-Z0-9_-]+$/ && $2 == "=" { 
+        in_block && $1 ~ /^[a-zA-Z0-9_-]+$/ && $2 == "=" {
             hostname = $1
             # Extract comment after #
             comment_start = index($0, "#")
@@ -295,9 +295,56 @@ check_prerequisites() {
     fi
 }
 
+# Function to load bootstrap cache config for the initial rebuild
+get_cache_config() {
+    local cache_config_file="./modules/core/caches.conf"
+
+    if [[ ! -f "$cache_config_file" ]]; then
+        print_error "Cache config file not found: $cache_config_file"
+        exit 1
+    fi
+
+    cat "$cache_config_file"
+}
+
+# Function to run the wallpaper post-command manually for initial asset generation
+run_wallpaper_post_command() {
+    local cache_config="$1"
+    local wallpaper_path="$(pwd)/modules/home/waypaper/wallpaper.jpg"
+
+    if [[ ! -f "$wallpaper_path" ]]; then
+        print_warning "Wallpaper placeholder not found at $wallpaper_path"
+        return
+    fi
+
+    echo ""
+    print_info "Generating initial theme assets from wallpaper placeholder..."
+    echo ""
+
+    if NIX_CONFIG="$cache_config" nix shell \
+        nixpkgs#wallust \
+        nixpkgs#librsvg \
+        nixpkgs#swayosd \
+        nixpkgs#procps \
+        --command bash -lc '
+            set -e
+            wallpaper_path="$1"
+
+            wallust run "$wallpaper_path"
+            rsvg-convert -a -w 1080 -h 1080 "$HOME/.cache/wallust/colors-nixoslogo.svg" -o "$HOME/.cache/wallust/colors-nixoslogo.png"
+        ' bash "$wallpaper_path"; then
+        print_success "✓ Initial theme assets generated"
+    else
+        print_warning "Failed to generate initial theme assets automatically"
+    fi
+
+    echo ""
+}
+
 # Function to perform a rebuild
 perform_rebuild() {
     local hostname="$1"
+    local cache_config="$2"
     
     echo ""
     print_info "═══════════════════════════════════════════════════"
@@ -311,9 +358,11 @@ perform_rebuild() {
     print_info "Building system configuration..."
     echo ""
     
-    sudo nixos-rebuild boot --flake ".#$hostname"
+    sudo NIX_CONFIG="$cache_config" nixos-rebuild boot --flake ".#$hostname"
     
     if [[ $? -eq 0 ]]; then
+        run_wallpaper_post_command "$cache_config"
+
         echo ""
         print_success "═══════════════════════════════════════════════════"
         print_success "  System built successfully!"
@@ -429,7 +478,8 @@ main() {
     fi
     
     # Perform the rebuild
-    perform_rebuild "$selected_host"
+    cache_config="$(get_cache_config)"
+    perform_rebuild "$selected_host" "$cache_config"
 }
 
 # Run main function
