@@ -420,29 +420,36 @@ configure_default_bootloader() {
 
 run_wallpaper_post_command() {
     local cache_config="$1"
-    local wallpaper_path="$(pwd)/modules/home/waypaper/wallpaper.jpg"
+    local colors_path="$(pwd)/modules/home/waypaper/defaultcolors.jpg"
+    local wallust_config="$(pwd)/modules/home/wallust/config.toml"
+    local wallust_templates="$(pwd)/modules/home/wallust/templates"
 
-    if [[ ! -f "$wallpaper_path" ]]; then
-        print_warning "Wallpaper placeholder not found at $wallpaper_path"
+    if [[ ! -f "$colors_path" ]]; then
+        print_warning "Default color source not found at $colors_path"
+        return
+    fi
+
+    if [[ ! -f "$wallust_config" || ! -d "$wallust_templates" ]]; then
+        print_warning "Wallust config/templates not found in repo"
         return
     fi
 
     echo ""
-    print_info "Generating initial theme assets from wallpaper placeholder..."
+    print_info "Generating initial theme assets and setting wallpaper..."
     echo ""
 
     if NIX_CONFIG="$cache_config" nix shell \
         nixpkgs#wallust \
         nixpkgs#librsvg \
-        nixpkgs#swayosd \
-        nixpkgs#procps \
         --command bash -lc '
             set -e
-            wallpaper_path="$1"
+            colors_path="$1"
+            wallust_config="$2"
+            wallust_templates="$3"
 
-            wallust run "$wallpaper_path"
+            wallust run "$colors_path" --config-file "$wallust_config" --templates-dir "$wallust_templates"
             rsvg-convert -a -w 1080 -h 1080 "$HOME/.cache/wallust/colors-nixoslogo.svg" -o "$HOME/.cache/wallust/colors-nixoslogo.png"
-        ' bash "$wallpaper_path"; then
+        ' bash "$colors_path" "$wallust_config" "$wallust_templates"; then
         print_success "✓ Initial theme assets generated"
     else
         print_warning "Failed to generate initial theme assets automatically"
