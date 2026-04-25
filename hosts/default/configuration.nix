@@ -14,6 +14,8 @@
     NIXOS_FLAKE_HOST = "default";
   };
 
+  legacyBootloader.enable = false;
+
   # This is a minimal configuration to get a generic system up and running.
   # Add device-specific configurations here as needed to improve compatibility.
   # For example, you may want to add specific GPU drivers or other hardware support based on the components in your system.

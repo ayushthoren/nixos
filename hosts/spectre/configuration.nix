@@ -1,5 +1,5 @@
 # Configuration for HP Specre x360 2015 (No dedicated graphics or UEFI support)
-{ lib, username, ... }:
+{ username, ... }:
 
 {
   imports = [
@@ -20,16 +20,7 @@
 
   cachyosKernel.enable = true;
 
-  boot.loader = lib.mkForce {
-    systemd-boot.enable = false;
-    grub = {
-      enable = true;
-      efiSupport = false;
-      efiInstallAsRemovable = false;
-      device = "nodev";
-      useOSProber = false;
-    };
-  };
+  legacyBootloader.enable = true;
 
   # Laptop power/thermal management
   powerManagement.enable = true;
