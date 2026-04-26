@@ -16,7 +16,12 @@
   programs.steam = { enable = true; };
 
   # File manager
-  programs.thunar.enable = true;
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs; [
+      thunar-archive-plugin
+    ];
+  };
   programs.xfconf.enable = true;
   services.gvfs.enable = true; # Mount, trash, and other functionalities
   services.tumbler.enable = true; # Thumbnail support for images   
@@ -28,7 +33,10 @@
     extraSpecialArgs = { inherit inputs; };
 
     users.${username} = { config, pkgs, lib, ... }: {
-      imports = [ ./../home ];
+      imports = [
+        ./../home
+        ./xdg-defaults.nix
+      ];
 
       home.stateVersion = "25.05";
 
@@ -50,12 +58,14 @@
         nh
         librsvg
         kdePackages.gwenview
+        kdePackages.ark
         vlc
         kdePackages.okular
         adwaita-icon-theme
         cowsay
         mesa-demos
         qdirstat
+        gparted
         nmap
         rclone
         winboat
@@ -77,34 +87,20 @@
         # Applications
         spotify
         vesktop
+        slack
         qbittorrent
         proton-vpn
         google-chrome
         obsidian
         gimp
+        blender
         obs-studio
-        davinci-resolve
+        kdePackages.kdenlive
         zoom-us
-        
+
         # Games
         prismlauncher
       ];
-
-      # XDG default applications
-      xdg = {
-        enable = true;
-        mimeApps.enable = true;
-        mimeApps.defaultApplications = {
-          "text/plain" = [ "code.desktop" ];
-          "image/jpeg" = [ "org.kde.gwenview.desktop" ];
-          "image/png" = [ "org.kde.gwenview.desktop" ];
-          "video/mp4" = [ "vlc.desktop" ];
-          "video/x-matroska" = [ "vlc.desktop" ];
-          "application/pdf" = [ "okular.desktop" ];
-          "x-scheme-handler/https" = [ "firefox.desktop" ];
-          "x-scheme-handler/http" = [ "firefox.desktop" ];
-        };
-      };
 
       systemd.user.services.polkit-gnome-authentication-agent-1 = {
         Unit = {

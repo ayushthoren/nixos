@@ -1,12 +1,8 @@
-{ ... }:
+{ config, ... }:
 {
-  home.sessionVariables = {
-    # Avoid per-install profile rotation when Firefox store paths change
-    MOZ_LEGACY_PROFILES = "1";
-  };
-
   programs.firefox = {
     enable = true;
+    configPath = "${config.xdg.configHome}/mozilla/firefox";
 
     policies = {
       ExtensionSettings = {

@@ -1,12 +1,25 @@
 { pkgs, inputs, ... }:
+let
+  hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+  hyprlandPortalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+
+  # Create a custom sessions directory to prevent the UWSM one from showing up
+  myWaylandSessions = pkgs.runCommand "my-wayland-sessions" { } ''
+    mkdir -p $out/share/wayland-sessions
+
+    ln -s ${hyprlandPackage}/share/wayland-sessions/hyprland.desktop \
+      $out/share/wayland-sessions/hyprland.desktop
+  '';
+in
 {
   services.displayManager.ly.enable = true;
-  
+  services.displayManager.ly.settings.waylandsessions = "${myWaylandSessions}/share/wayland-sessions";
+
   programs.hyprland = {
     enable = true;
     withUWSM = false;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    package = hyprlandPackage;
+    portalPackage = hyprlandPortalPackage;
   };
 
   xdg.portal = {
