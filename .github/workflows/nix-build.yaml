@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  workflow_run:
+    workflows:
+      - Cache
+    branches:
+      - main
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nix-build-${{ github.event.workflow_run.head_branch || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    name: Build hosts
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Load flake cache config
+        run: |
+          {
+            echo "NIX_CONFIG<<EOF"
+            cat ./modules/core/caches.conf
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Build default host
+        run: |
+          nix build \
+            ".#nixosConfigurations.default.config.system.build.toplevel" \
+            --print-build-logs \
+            --out-link "result-default"
+
+      - name: Build remaining hosts
+        run: |
+          nix eval --raw .#nixosConfigurations --apply '
+            configs:
+              builtins.concatStringsSep "\n" (
+                builtins.filter (host: host != "default") (builtins.attrNames configs)
+              )
+          ' | while IFS= read -r host; do
+            if [ -z "${host}" ]; then
+              continue
+            fi
+
+            echo "::group::Build ${host}"
+            nix build \
+              ".#nixosConfigurations.${host}.config.system.build.toplevel" \
+              --print-build-logs \
+              --out-link "result-${host}"
+            echo "::endgroup::"
+          done

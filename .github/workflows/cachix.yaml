@@ -1,4 +1,4 @@
-name: Build and update Cachix
+name: Cache
 
 on:
   push:
@@ -32,9 +32,6 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Set up Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Load flake cache config
         run: |
