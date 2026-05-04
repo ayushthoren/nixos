@@ -23,7 +23,7 @@ in
     };
 
     services.open-webui = {
-      enable = true;
+      enable = false;
       environment = {
         # ENABLE_PERSISTENT_CONFIG = "False";
         WEBUI_AUTH = "False";

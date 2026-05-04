@@ -1,4 +1,10 @@
 { config, ... }:
+
+let
+  onePassword = "_d634138d-c276-4fc8-924b-40a0ea21d284_-browser-action";
+  darkReader = "addon_darkreader_org-browser-action";
+  uBlockOrigin = "ublock0_raymondhill_net-browser-action";
+in
 {
   programs.firefox = {
     enable = true;
@@ -74,6 +80,49 @@
         "sidebar.animation.expand-on-hover.duration-ms" = 100;
         "sidebar.animation.expand-on-hover.delay-duration-ms" = 0;
 
+        # Toolbar layout
+        "browser.uiCustomization.state" = builtins.toJSON {
+          placements = {
+            "widget-overflow-fixed-list" = [ ];
+            "unified-extensions-area" = [ ];
+            "nav-bar" = [
+              "firefox-view-button"
+              "alltabs-button"
+              "unified-extensions-button"
+              "back-button"
+              "forward-button"
+              "urlbar-container"
+              "vertical-spacer"
+              uBlockOrigin
+              darkReader
+              onePassword
+              "sidebar-button"
+            ];
+            "toolbar-menubar" = [ "menubar-items" ];
+            "TabsToolbar" = [ ];
+            "vertical-tabs" = [ "tabbrowser-tabs" ];
+            "PersonalToolbar" = [
+              "import-button"
+              "personal-bookmarks"
+            ];
+          };
+          seen = [
+            "developer-button"
+            uBlockOrigin
+            darkReader
+            onePassword
+          ];
+          dirtyAreaCache = [
+            "nav-bar"
+            "TabsToolbar"
+            "vertical-tabs"
+            "PersonalToolbar"
+            "toolbar-menubar"
+          ];
+          currentVersion = 23;
+          newElementCount = 0;
+        };
+
         # Persistence
         "browser.privatebrowsing.autostart" = false;
         "privacy.history.custom" = false;
@@ -88,4 +137,5 @@
       };
     };
   };
+  home.file.".mozilla/native-messaging-hosts".enable = false;
 }
