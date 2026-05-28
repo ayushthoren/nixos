@@ -1,11 +1,11 @@
 # Configuration for laptop with NVIDIA Dedicated Graphics (A2000 Mobile) & Intel Integrated Graphics
-{ config, pkgs, inputs, username, ... }:
+{ lib, pkgs, inputs, username, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
     ./../../modules/core
-    # nixos-hardware flake handles things like tlp (power management) automatically.
+    # nixos-hardware flake handles things like tlp (power management) automatically
     inputs.nixos-hardware.nixosModules.dell-precision-5560
   ];
 
@@ -28,13 +28,12 @@
   # ];
 
   cachyosKernel.enable = true;
-  nvidia.enable = true;
   ollama.enable = true;
 
-  services.xserver.videoDrivers = [
-    "modesetting"
-    "nvidia"
-  ];
+  # Default profile uses integrated-only for battery
+  nvidia.enable = false;
+
+  services.xserver.videoDrivers = [ "modesetting" ];
 
   hardware.graphics.extraPackages = with pkgs; [
     intel-media-driver
@@ -44,31 +43,94 @@
     libvdpau-va-gl
   ];
 
-  hardware.nvidia = {
-    powerManagement.enable = true;
-    powerManagement.finegrained = true;
-    # package = config.boot.kernelPackages.nvidiaPackages.beta;
+  # Keep the dGPU driver stack unloaded in the default profile
+  boot.blacklistedKernelModules = [
+    "nouveau"
+    "nvidia"
+    "nvidia_drm"
+    "nvidia_modeset"
+    "nvidia_uvm"
+  ];
 
-    prime = {
-      offload = {
-        enable = true;
-        enableOffloadCmd = true;
-      };
-      # sync.enable = true;
-      intelBusId = "PCI:0:2:0";
-      nvidiaBusId = "PCI:1:0:0"; 
+  boot.kernelParams = [
+    "module_blacklist=nouveau,nvidia,nvidia_drm,nvidia_modeset,nvidia_uvm"
+  ];
+
+  systemd.services.disable-nvidia-dgpu = {
+    description = "Disable NVIDIA dGPU";
+    wantedBy = [ "multi-user.target" ];
+    after = [
+      "sys-subsystem-pci-devices-0000:01:00.0.device"
+      "sys-subsystem-pci-devices-0000:01:00.1.device"
+    ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
     };
-  };
 
-  programs.xwayland.enable = true;
-  environment.variables = {
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    LIBVA_DRIVER_NAME = "nvidia";
+    script = ''
+      for dev in 0000:01:00.1 0000:01:00.0; do
+        path=/sys/bus/pci/devices/$dev
+
+        if [ -e "$path/driver/unbind" ]; then
+          echo "$dev" > "$path/driver/unbind" || true
+        fi
+
+        if [ -e "$path/remove" ]; then
+          echo 1 > "$path/remove" || true
+        fi
+      done
+    '';
   };
 
   environment.systemPackages = with pkgs; [
     intel-gpu-tools
   ];
+
+  environment.variables = {
+    LIBVA_DRIVER_NAME = "iHD";
+  };
+
+  programs.xwayland.enable = lib.mkForce true;
+
+  specialisation = {
+    nvidia.configuration = {
+      system.nixos.tags = [ "nvidia" ];
+
+      nvidia.enable = lib.mkForce true;
+
+      services.xserver.videoDrivers = lib.mkForce [
+        "modesetting"
+        "nvidia"
+      ];
+
+      hardware.nvidia = {
+        powerManagement.enable = lib.mkForce true;
+        powerManagement.finegrained = lib.mkForce true;
+        # package = config.boot.kernelPackages.nvidiaPackages.beta;
+
+        prime = {
+          offload = {
+            enable = lib.mkForce true;
+            enableOffloadCmd = lib.mkForce true;
+          };
+          # sync.enable = true;
+          intelBusId = "PCI:0:2:0";
+          nvidiaBusId = "PCI:1:0:0";
+        };
+      };
+
+      environment.variables = lib.mkForce {
+        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+        LIBVA_DRIVER_NAME = "nvidia";
+      };
+
+      boot.blacklistedKernelModules = lib.mkForce [ "nouveau" ];
+      boot.kernelParams = lib.mkForce [ "module_blacklist=nouveau" ];
+      systemd.services.disable-nvidia-dgpu.enable = lib.mkForce false;
+    };
+  };
 
   # Fingerprint reader
   # services.fprintd.enable = true;
