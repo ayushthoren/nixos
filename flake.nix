@@ -48,6 +48,7 @@
         desktop = mkHost "desktop"; # Desktop machine with NVIDIA RTX 3060 12GB and AMD Ryzen 7 7800X3D
         spectre = mkHost "spectre"; # 2015 HP Spectre x360 with Intel integrated graphics
         precision = mkHost "precision"; # Dell Precision 5560 with NVIDIA RTX A2000 and Intel integrated graphics
+        nuc = mkHost "nuc"; # Intel NUC with i3-5010U
       };
     };
 }

@@ -37,6 +37,10 @@
     enable32Bit = true;
   };
 
+  hardware.enableRedistributableFirmware = true;
+  
+  services.fwupd.enable = true;
+
   zramSwap = {
     enable = true;
     algorithm = "zstd";
