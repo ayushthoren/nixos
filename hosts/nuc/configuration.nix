@@ -18,12 +18,4 @@
   home-manager.users.${username}.hyprland.performanceMode = true;
 
   cachyosKernel.enable = true;
-
-  legacyBootloader = {
-    enable = false;
-    device = "nodev";
-  };
-
-  boot.loader.efi.canTouchEfiVariables = lib.mkForce true;
-  boot.loader.grub.efiInstallAsRemovable = lib.mkForce false;
 }

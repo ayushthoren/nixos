@@ -18,25 +18,32 @@ in
     boot.loader = lib.mkMerge [
       {
         systemd-boot.enable = false;
-        efi.efiSysMountPoint = "/boot";
         grub = {
           enable = true;
+          efiInstallAsRemovable = false;
+        };
+      }
+
+      (lib.mkIf (!cfg.enable) {
+        efi = {
+          efiSysMountPoint = "/boot";
+          canTouchEfiVariables = true;
+        };
+        grub = {
           efiSupport = true;
-          efiInstallAsRemovable = true;
           device = "nodev";
           useOSProber = true;
         };
-      }
-      (lib.mkIf cfg.enable (lib.mkForce {
-        systemd-boot.enable = false;
+      })
+
+      (lib.mkIf cfg.enable {
+        efi.canTouchEfiVariables = false;
         grub = {
-          enable = true;
           efiSupport = false;
-          efiInstallAsRemovable = false;
           device = cfg.device;
           useOSProber = false;
         };
-      }))
+      })
     ];
   };
 }
