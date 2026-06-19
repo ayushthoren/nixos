@@ -17,19 +17,19 @@
       hyprshot       # Screenshot tool for Hyprland
     ];
 
-    # Only create performance.conf if performance mode is enabled
-    xdg.configFile."hypr/performance.conf" = lib.mkIf config.hyprland.performanceMode {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/hyprland/performance.conf";
+    # Only create performance.lua if performance mode is enabled
+    xdg.configFile."hypr/performance.lua" = lib.mkIf config.hyprland.performanceMode {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/hyprland/performance.lua";
     };
 
-    # Imports file that conditionally sources performance.conf
-    xdg.configFile."hypr/imports.conf".text = 
+    # Imports file that conditionally sources performance.lua
+    xdg.configFile."hypr/imports.lua".text =
       if config.hyprland.performanceMode
-      then "source = ~/.config/hypr/performance.conf"
-      else "# Performance mode disabled";
+      then ''require("performance")''
+      else "-- Performance mode disabled\n";
 
-    # Use symlink for hyprland.conf
-    xdg.configFile."hypr/hyprland.conf".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/hyprland/hyprland.conf";
+    # Use symlink for hyprland.lua
+    xdg.configFile."hypr/hyprland.lua".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/modules/home/hyprland/hyprland.lua";
     
     # --------------------------------------------------
     
@@ -37,7 +37,8 @@
       enable = true;
       package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
       portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-      extraConfig = "#"; # Silence warning
+      configType = "lua";
+      extraConfig = "--"; # Silence warning
     };
   };
 }

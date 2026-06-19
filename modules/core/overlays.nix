@@ -20,5 +20,19 @@
       };
     })
 
+    # Waybar from git
+    (final: prev: {
+      waybar = (prev.waybar.override {
+        cavaSupport = false;
+      }).overrideAttrs {
+        src = final.fetchFromGitHub {
+          owner = "Alexays";
+          repo = "Waybar";
+          rev = "05945748dccce28bf96d26d8f64a9e69a8dd49ba";
+          hash = "sha256-51R3mIt8cLNvh/X5qe9vOqeJCj0U9KRyemVE5y+OhiU=";
+        };
+      };
+    })
+
   ];
 }

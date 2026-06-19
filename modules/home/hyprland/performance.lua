@@ -1,0 +1,14 @@
+-- Performance overrides for lower-end hardware.
+-- This file is imported conditionally by hyprland.performanceMode.
+
+hl.config({
+    decoration = {
+        shadow = {
+            enabled = false,
+        },
+
+        blur = {
+            enabled = false,
+        },
+    },
+})
