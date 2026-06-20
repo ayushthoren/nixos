@@ -2,9 +2,8 @@
   description = "NixOS + Home Manager setup with Hyprland";
 
   inputs = {
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-claude.url = "github:NixOS/nixpkgs/d6c62af44d89b482633f6fab7c4feb08c6b59bff";
 
     home-manager = {
       url = "github:nix-community/home-manager/master";
@@ -26,7 +25,7 @@
     mediaplayer.url = "./modules/home/waybar/mediaplayer";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-claude, home-manager, hyprland, mediaplayer, nix-flatpak, ... } @ inputs:
+  outputs = { self, nixpkgs, home-manager, hyprland, mediaplayer, nix-flatpak, ... } @ inputs:
     let
       system = "x86_64-linux";
       username = "thoren";

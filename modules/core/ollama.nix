@@ -2,13 +2,6 @@
 
 let
   cfg = config.ollama;
-
-  pkgsClaude = import inputs.nixpkgs-claude {
-    system = pkgs.stdenv.hostPlatform.system;
-    config = pkgs.config;
-  };
-
-  claude-code-pinned = pkgsClaude.claude-code;
 in
 {
   options.ollama = {
@@ -34,7 +27,7 @@ in
     };
     
     environment.systemPackages = with pkgs; [
-      claude-code-pinned
+      claude-code
     ];
     
     environment.sessionVariables = {
