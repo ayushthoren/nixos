@@ -350,12 +350,12 @@ end
 -- hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Scroll through existing workspaces on current monitor with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "m+1" }))
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "m-1" }))
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "m-1" }))
+hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "m+1" }))
 
 -- Zoom into workspace with shift + mainMod + scroll
-hl.bind(mainMod .. " + SHIFT + mouse_up", hl.dsp.exec_cmd([[hyprctl getoption cursor:zoom_factor | grep float | awk '{if($2!=1) system("hyprctl keyword cursor:zoom_factor " $2 - 0.5) }' && hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2}']]))
-hl.bind(mainMod .. " + SHIFT + mouse_down", hl.dsp.exec_cmd([[hyprctl getoption cursor:zoom_factor | grep float | awk '{ system("hyprctl keyword cursor:zoom_factor " $2 + 0.5) }' && hyprctl getoption cursor:zoom_factor | grep float | awk '{print $2}']]))
+hl.bind(mainMod .. " + SHIFT + mouse_down", hl.dsp.exec_cmd([=[sh -c 'z=$(hyprctl getoption cursor:zoom_factor | awk "/^float:/ {print \$2}"); z=$(awk -v z="$z" "BEGIN { z -= 0.5; if (z < 1) z = 1; printf \"%.2f\", z }"); hyprctl eval "hl.config({ cursor = { zoom_factor = $z } })"']=]))
+hl.bind(mainMod .. " + SHIFT + mouse_up", hl.dsp.exec_cmd([=[sh -c 'z=$(hyprctl getoption cursor:zoom_factor | awk "/^float:/ {print \$2}"); z=$(awk -v z="$z" "BEGIN { z += 0.5; printf \"%.2f\", z }"); hyprctl eval "hl.config({ cursor = { zoom_factor = $z } })"']=]))
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })

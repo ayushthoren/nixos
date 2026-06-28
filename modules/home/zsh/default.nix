@@ -19,6 +19,25 @@
     };
 
     initContent = ''
+      if [[ "$TERM" == "xterm-kitty" ]]; then
+        typeset -A ZSH_HIGHLIGHT_STYLES
+        ZSH_HIGHLIGHT_STYLES=(
+          alias fg=12
+          arg0 fg=12
+          autodirectory fg=12,underline
+          builtin fg=12
+          command fg=12
+          function fg=12
+          hashed-command fg=12
+          precommand fg=12,bold
+          reserved-word fg=14
+          unknown-token fg=13,underline
+          comment fg=8
+        )
+      else
+        ZSH_HIGHLIGHT_HIGHLIGHTERS=()
+      fi
+
       [[ ! -f ${config.home.homeDirectory}/nixos/modules/home/zsh/p10k.zsh ]] || source ${config.home.homeDirectory}/nixos/modules/home/zsh/p10k.zsh
       if [[ $- == *i* ]]; then
         if [[ "$TERM" == "xterm-kitty" ]]; then

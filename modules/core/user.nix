@@ -11,6 +11,7 @@
 
   services.flatpak.packages = [
     { appId = "org.vinegarhq.Sober"; origin = "flathub"; }
+    { appId = "com.lunarclient.LunarClient"; origin = "flathub"; }
   ];
 
   programs.steam = { enable = true; };
@@ -75,6 +76,7 @@
         zip
         sshpass
         ripgrep
+        jq
 
         # Wayland/Desktop utilities
         swaynotificationcenter
