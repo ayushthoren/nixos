@@ -33,6 +33,25 @@
   # Default profile uses integrated-only for battery
   nvidia.enable = false;
 
+  # Power management
+  systemd.sleep.settings.Sleep.HibernateDelaySec = "15min";
+
+  services.tlp.settings = {
+    CPU_ENERGY_PERF_POLICY_ON_AC = "balance_performance";
+    CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+    CPU_BOOST_ON_BAT = 0;
+    CPU_HWP_DYN_BOOST_ON_BAT = 0;
+    PLATFORM_PROFILE_ON_BAT = "low-power";
+    PCIE_ASPM_ON_AC = "default";
+    PCIE_ASPM_ON_BAT = "powersupersave";
+    RUNTIME_PM_ON_AC = "auto";
+    RUNTIME_PM_ON_BAT = "auto";
+    SATA_LINKPWR_ON_BAT = "med_power_with_dipm";
+    SOUND_POWER_SAVE_ON_BAT = 1;
+    USB_AUTOSUSPEND = 1;
+    WIFI_PWR_ON_BAT = "on";
+  };
+
   services.xserver.videoDrivers = [ "modesetting" ];
 
   hardware.graphics.extraPackages = with pkgs; [

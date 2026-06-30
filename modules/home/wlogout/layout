@@ -6,7 +6,7 @@
 }
 {
     "label" : "hibernate",
-    "action" : "notify-send 'Hibernate' 'This action is disabled.'",
+    "action" : "systemctl hibernate",
     "text" : "Hibernate",
     "keybind" : "h"
 }
@@ -24,7 +24,7 @@
 }
 {
     "label" : "suspend",
-    "action" : "systemctl suspend",
+    "action" : "systemctl suspend-then-hibernate",
     "text" : "Suspend",
     "keybind" : "u"
 }

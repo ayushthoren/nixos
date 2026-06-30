@@ -1,5 +1,5 @@
 # Miscellaneous system configurations
-{ pkgs, inputs, username, ... }:
+{ config, lib, pkgs, inputs, username, ... }:
 {
   nix = {
     optimise.automatic = true;
@@ -46,6 +46,9 @@
     algorithm = "zstd";
     memoryPercent = 50;
   };
+
+  boot.resumeDevice = lib.mkIf (config.swapDevices != [ ])
+    (lib.mkDefault (builtins.head config.swapDevices).device);
 
   systemd.services.NetworkManager-wait-online.enable = false;
 

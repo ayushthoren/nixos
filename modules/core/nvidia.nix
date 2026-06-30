@@ -15,6 +15,8 @@ in
       modesetting.enable = true;
       open = true;
       nvidiaSettings = true;
+      powerManagement.enable = lib.mkDefault true;
+      powerManagement.finegrained = lib.mkDefault true;
     };
 
     services.ollama.package = lib.mkIf config.ollama.enable pkgs.ollama-cuda;
