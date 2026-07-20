@@ -11,7 +11,7 @@ in
   config = lib.mkIf cfg.enable {
     services.ollama = {
       enable = true;
-      models = "/var/lib/ollama/models";
+      modelsDir = "/var/lib/ollama/models";
       loadModels = [ "gemma3:1b" ];
     };
 

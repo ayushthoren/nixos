@@ -25,7 +25,11 @@
   };
   programs.xfconf.enable = true;
   services.gvfs.enable = true; # Mount, trash, and other functionalities
-  services.tumbler.enable = true; # Thumbnail support for images   
+  services.tumbler.enable = true; # Thumbnail support for images
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-40.10.5"
+  ];
 
   home-manager = {
     useGlobalPkgs = true;
