@@ -5,7 +5,7 @@
   imports = [
     ./hardware-configuration.nix
     ./../../modules/core
-    # nixos-hardware flake handles things like tlp (power management) automatically
+    # nixos-hardware for device-specific configurations, TLP is replaced by auto-cpufreq below
     inputs.nixos-hardware.nixosModules.dell-precision-5560
   ];
 
@@ -36,20 +36,19 @@
   # Power management
   systemd.sleep.settings.Sleep.HibernateDelaySec = "15min";
 
-  services.tlp.settings = {
-    CPU_ENERGY_PERF_POLICY_ON_AC = "balance_performance";
-    CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-    CPU_BOOST_ON_BAT = 0;
-    CPU_HWP_DYN_BOOST_ON_BAT = 0;
-    PLATFORM_PROFILE_ON_BAT = "low-power";
-    PCIE_ASPM_ON_AC = "default";
-    PCIE_ASPM_ON_BAT = "powersupersave";
-    RUNTIME_PM_ON_AC = "auto";
-    RUNTIME_PM_ON_BAT = "auto";
-    SATA_LINKPWR_ON_BAT = "med_power_with_dipm";
-    SOUND_POWER_SAVE_ON_BAT = 1;
-    USB_AUTOSUSPEND = 1;
-    WIFI_PWR_ON_BAT = "on";
+  services.tlp.enable = lib.mkForce false;
+  services.auto-cpufreq = {
+    enable = true;
+    settings = {
+      battery = {
+        governor = "powersave";
+        turbo = "never";
+      };
+      charger = {
+        governor = "performance";
+        turbo = "auto";
+      };
+    };
   };
 
   services.xserver.videoDrivers = [ "modesetting" ];
