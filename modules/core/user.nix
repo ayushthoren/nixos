@@ -57,10 +57,14 @@
       };
 
       home.packages = with pkgs; [
+        # NixOS utilities
+        nh
+        nixpkgs-review
+        nixfmt
+
         # System utilities
         btop
         unzip
-        nh
         librsvg
         kdePackages.gwenview
         kdePackages.ark
@@ -91,6 +95,7 @@
         nodejs
         python3
         jdk
+        gh
 
         # Applications
         spotify
