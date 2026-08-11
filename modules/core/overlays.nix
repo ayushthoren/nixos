@@ -10,9 +10,9 @@
           src = final.fetchFromGitHub {
             owner = "davatorium";
             repo = "rofi";
-            rev = "89c768c1f98e49a762cb36bc40d941fd42e1c660";
+            rev = "f1ee9b8e4a612ce7d13eeb57f8fe81b985900071";
             fetchSubmodules = true;
-            sha256 = "sha256-ckTsPjzWx2WzrV+rZfNB00UNStlaZ9NLJonjYRSR4/k=";
+            sha256 = "sha256-Vqiqyq1KTr0DfSFr7FD7rG9wnWqrkZTobjLfR/aOkcQ=";
           };
           version = "git";
           doInstallCheck = false;
@@ -24,14 +24,24 @@
     (final: prev: {
       waybar = (prev.waybar.override {
         cavaSupport = false;
-      }).overrideAttrs {
+      }).overrideAttrs (oldAttrs: {
         src = final.fetchFromGitHub {
           owner = "Alexays";
           repo = "Waybar";
-          rev = "05945748dccce28bf96d26d8f64a9e69a8dd49ba";
-          hash = "sha256-51R3mIt8cLNvh/X5qe9vOqeJCj0U9KRyemVE5y+OhiU=";
+          rev = "084d87401d0a91182c16aa7e5f674a7dde767185";
+          hash = "sha256-POvwObPOp6O14n6KYWNLp2Y3paunA5f8U1NCaodNFcc=";
         };
-      };
+        buildInputs = (oldAttrs.buildInputs or []) ++ [ final.modemmanager ];
+      });
+    })
+
+    # Frei0r CUDA support
+    (final: prev: {
+      frei0r = prev.frei0r.overrideAttrs (old: {
+        nativeBuildInputs =
+          (old.nativeBuildInputs or [])
+          ++ [ final.cudaPackages.cuda_nvcc ];
+      });
     })
 
   ];
