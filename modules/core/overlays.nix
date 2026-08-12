@@ -32,6 +32,11 @@
           hash = "sha256-POvwObPOp6O14n6KYWNLp2Y3paunA5f8U1NCaodNFcc=";
         };
         buildInputs = (oldAttrs.buildInputs or []) ++ [ final.modemmanager ];
+        checkPhase = ''
+          runHook preCheck
+          meson test --no-rebuild --print-errorlogs --timeout-multiplier=0 waybar hyprland
+          runHook postCheck
+        '';
       });
     })
 
