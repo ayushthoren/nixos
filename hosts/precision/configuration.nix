@@ -74,33 +74,11 @@
     "module_blacklist=nouveau,nvidia,nvidia_drm,nvidia_modeset,nvidia_uvm"
   ];
 
-  systemd.services.disable-nvidia-dgpu = {
-    description = "Disable NVIDIA dGPU";
-    wantedBy = [ "multi-user.target" ];
-    after = [
-      "sys-subsystem-pci-devices-0000:01:00.0.device"
-      "sys-subsystem-pci-devices-0000:01:00.1.device"
-    ];
-
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-
-    script = ''
-      for dev in 0000:01:00.1 0000:01:00.0; do
-        path=/sys/bus/pci/devices/$dev
-
-        if [ -e "$path/driver/unbind" ]; then
-          echo "$dev" > "$path/driver/unbind" || true
-        fi
-
-        if [ -e "$path/remove" ]; then
-          echo 1 > "$path/remove" || true
-        fi
-      done
-    '';
-  };
+  # Allow the A2000 to suspend into D3cold
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="pci", KERNEL=="0000:01:00.0", ATTR{power/control}="auto"
+    ACTION=="add", SUBSYSTEM=="pci", KERNEL=="0000:00:01.0", ATTR{power/control}="auto"
+  '';
 
   environment.systemPackages = with pkgs; [
     intel-gpu-tools
@@ -139,14 +117,8 @@
         };
       };
 
-      environment.variables = lib.mkForce {
-        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-        LIBVA_DRIVER_NAME = "nvidia";
-      };
-
       boot.blacklistedKernelModules = lib.mkForce [ "nouveau" ];
       boot.kernelParams = lib.mkForce [ "module_blacklist=nouveau" ];
-      systemd.services.disable-nvidia-dgpu.enable = lib.mkForce false;
     };
   };
 
