@@ -4,6 +4,8 @@ let
   onePassword = "_d634138d-c276-4fc8-924b-40a0ea21d284_-browser-action";
   darkReader = "addon_darkreader_org-browser-action";
   uBlockOrigin = "ublock0_raymondhill_net-browser-action";
+  cookieEditor = "_c3c10168-4186-445c-9c5b-63f12b8e2c87_-browser-action";
+  videoDownloadHelper = "_b9db16a4-6edc-47ec-a1f4-b86292ed211d_-browser-action";
 in
 {
   programs.firefox = {
@@ -11,6 +13,7 @@ in
     configPath = "${config.xdg.configHome}/mozilla/firefox";
 
     policies = {
+      # Extensions
       ExtensionSettings = {
         # uBlock Origin
         "uBlock0@raymondhill.net" = {
@@ -30,39 +33,97 @@ in
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
           default_area = "navbar";
         };
+        # Cookie-Editor
+        "{c3c10168-4186-445c-9c5b-63f12b8e2c87}" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/cookie-editor/latest.xpi";
+          default_area = "navbar";
+        };
+        # Video Download Helper
+        "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/video-downloadhelper/latest.xpi";
+          default_area = "navbar";
+        };
       };
+
+      # Privacy and telemetry
+      DisableTelemetry = true;
+      DisableFirefoxStudies = true;
+      DisableRemoteImprovements = true;
+      CaptivePortal = false;
+      NetworkPrediction = true;
+      SearchSuggestEnabled = true;
+      FirefoxSuggest = {
+        WebSuggestions = false;
+        SponsoredSuggestions = false;
+        ImproveSuggest = false;
+        OnlineEnabled = false;
+        Locked = true;
+      };
+      EnableTrackingProtection = {
+        Value = true;
+        Locked = true;
+        Category = "strict";
+        Cryptomining = true;
+        Fingerprinting = true;
+        EmailTracking = true;
+        SuspectedFingerprinting = true;
+      };
+
+      # Disable account/promotional features
+      DisableAccounts = true;
+      IPProtectionAvailable = false;
+      VisualSearchEnabled = false;
+      AIControls = {
+        Default = {
+          Value = "blocked";
+          Locked = true;
+        };
+        Translations = {
+          Value = "available";
+          Locked = true;
+        };
+      };
+      UserMessaging = {
+        ExtensionRecommendations = false;
+        FeatureRecommendations = false;
+        UrlbarInterventions = false;
+        SkipOnboarding = true;
+        MoreFromMozilla = false;
+        FirefoxLabs = false;
+        Locked = true;
+      };
+
+      # Home and browser customization
       FirefoxHome = {
         Search = true;
         TopSites = false;
         SponsoredTopSites = false;
         Highlights = false;
-        Pocket = false;
         Stories = false;
-        SponsoredPocket = false;
         SponsoredStories = false;
-        Snippets = false;
-      };
-      FirefoxSuggest = {
-        SponsoredSuggestions = false;
-      };
-      DisableTelemetry = true;
-      DisableFirefoxStudies = true;
-      EnableTrackingProtection = {
-        Value = true;
+        Widgets = {
+          Enabled = false;
+        };
         Locked = true;
-        Cryptomining = true;
-        Fingerprinting = true;
       };
-      DisablePocket = true;
-      DisableFirefoxAccounts = true;
-      DisableAccounts = true;
-      DisableFirefoxScreenshots = true;
-      OverrideFirstRunPage = "";
-      OverridePostUpdatePage = "";
-      DontCheckDefaultBrowser = true;
       DisplayBookmarksToolbar = "never";
       DisplayMenuBar = "default-off";
       SearchBar = "unified";
+      NoDefaultBookmarks = true;
+      DisableSetDesktopBackground = true;
+      DisableFirefoxScreenshots = true;
+
+      # Startup and package management
+      DisableAppUpdate = true;
+      DisableProfileImport = true;
+      DontCheckDefaultBrowser = true;
+      OverrideFirstRunPage = "";
+      OverridePostUpdatePage = "";
+
+      # Rendering
+      HardwareAcceleration = true;
     };
 
     profiles.default = {
@@ -71,6 +132,12 @@ in
       path = "default";
       isDefault = true;
       settings = {
+        # Crash reports are separate from telemetry
+        "browser.crashReports.unsubmittedCheck.enabled" = false;
+        "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;
+        "browser.tabs.crashReporting.sendReport" = false;
+        "browser.tabs.crashReporting.includeURL" = false;
+
         # Vertical tabs
         "sidebar.revamp" = true;
         "sidebar.verticalTabs" = true;
@@ -86,16 +153,18 @@ in
             "widget-overflow-fixed-list" = [ ];
             "unified-extensions-area" = [ ];
             "nav-bar" = [
-              "firefox-view-button"
-              "alltabs-button"
-              "unified-extensions-button"
+              "home-button"
+              "vertical-spacer"
               "back-button"
               "forward-button"
+              "stop-reload-button"
               "urlbar-container"
-              "vertical-spacer"
+              "downloads-button"
               uBlockOrigin
-              darkReader
               onePassword
+              cookieEditor
+              darkReader
+              "unified-extensions-button"
               "sidebar-button"
             ];
             "toolbar-menubar" = [ "menubar-items" ];
@@ -111,6 +180,8 @@ in
             uBlockOrigin
             darkReader
             onePassword
+            cookieEditor
+            videoDownloadHelper
           ];
           dirtyAreaCache = [
             "nav-bar"
@@ -119,7 +190,7 @@ in
             "PersonalToolbar"
             "toolbar-menubar"
           ];
-          currentVersion = 23;
+          currentVersion = 26;
           newElementCount = 0;
         };
 
