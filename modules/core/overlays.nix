@@ -20,26 +20,6 @@
       };
     })
 
-    # Waybar from git
-    (final: prev: {
-      waybar = (prev.waybar.override {
-        cavaSupport = false;
-      }).overrideAttrs (oldAttrs: {
-        src = final.fetchFromGitHub {
-          owner = "Alexays";
-          repo = "Waybar";
-          rev = "084d87401d0a91182c16aa7e5f674a7dde767185";
-          hash = "sha256-POvwObPOp6O14n6KYWNLp2Y3paunA5f8U1NCaodNFcc=";
-        };
-        buildInputs = (oldAttrs.buildInputs or []) ++ [ final.modemmanager ];
-        checkPhase = ''
-          runHook preCheck
-          meson test --no-rebuild --print-errorlogs --timeout-multiplier=0 waybar hyprland
-          runHook postCheck
-        '';
-      });
-    })
-
     # Frei0r CUDA support
     (final: prev: {
       frei0r = prev.frei0r.overrideAttrs (old: {

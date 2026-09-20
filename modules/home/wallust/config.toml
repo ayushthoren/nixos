@@ -1,33 +1,15 @@
 backend = "fastresize"
-color_space = "lch"
+color_space = "labmixed"
 palette = "dark"
 
 [templates]
 rofi.template = 'colors-rofi.rasi'
 rofi.target = '~/.cache/wallust/colors-rofi.rasi'
-waybar.template = 'colors-waybar.css'
-waybar.target = '~/.cache/wallust/colors-waybar.css'
-swayosd.template = 'colors-swayosd.css'
-swayosd.target = '~/.cache/wallust/colors-swayosd.css'
 hypr.template = 'colors-hypr.lua'
 hypr.target = '~/.cache/wallust/colors-hypr.lua'
-hyprlock.template = 'colors-hypr.conf'
-hyprlock.target = '~/.cache/wallust/colors-hyprlock.conf'
 kitty.template = 'colors-kitty.conf'
 kitty.target = '~/.cache/wallust/colors-kitty.conf'
-wlogout.template = 'colors-wlogout.css'
-wlogout.target = '~/.cache/wallust/colors-wlogout.css'
 nixoslogo.template = 'colors-nixoslogo.svg'
 nixoslogo.target = '~/.cache/wallust/colors-nixoslogo.svg'
-wlogout-lock.template = 'wlogout/lock.svg'
-wlogout-lock.target = '~/.cache/wallust/wlogout/lock.svg'
-wlogout-logout.template = 'wlogout/logout.svg'
-wlogout-logout.target = '~/.cache/wallust/wlogout/logout.svg'
-wlogout-suspend.template = 'wlogout/suspend.svg'
-wlogout-suspend.target = '~/.cache/wallust/wlogout/suspend.svg'
-wlogout-hibernate.template = 'wlogout/hibernate.svg'
-wlogout-hibernate.target = '~/.cache/wallust/wlogout/hibernate.svg'
-wlogout-shutdown.template = 'wlogout/shutdown.svg'
-wlogout-shutdown.target = '~/.cache/wallust/wlogout/shutdown.svg'
-wlogout-reboot.template = 'wlogout/reboot.svg'
-wlogout-reboot.target = '~/.cache/wallust/wlogout/reboot.svg'
+quickshell.template = 'colors-quickshell.qml'
+quickshell.target = '~/.cache/wallust/ColorsQuickshell.qml'

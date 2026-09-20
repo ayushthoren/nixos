@@ -89,6 +89,7 @@
         # Wayland/Desktop utilities
         swaynotificationcenter
         libnotify
+        quickshell
 
         # Development tools
         vscode-fhs

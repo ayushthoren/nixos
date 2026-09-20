@@ -58,7 +58,7 @@ local menu = "rofi -show drun"
 -- Or execute your favorite apps at launch like this:
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd("waybar & swaync & swayosd-server & swww")
+    hl.exec_cmd("qs & swww")
     hl.exec_cmd("waypaper --restore --no-post-command")
     hl.exec_cmd("wl-paste --watch cliphist store")
 end)
@@ -113,7 +113,7 @@ hl.config({
         -- col.inactive_border = "rgba(595959aa)"
 
         col = {
-            active_border = { colors = { colors.color4, colors.color3, colors.color2 }, angle = 45 },
+            active_border = colors.color3,
             inactive_border = colors.color0,
         },
 
@@ -127,7 +127,7 @@ hl.config({
     },
 
     decoration = {
-        rounding = 10,
+        rounding = 0,
         rounding_power = 2,
 
         -- Change transparency of focused and unfocused windows
@@ -267,6 +267,12 @@ hl.gesture({
 -- hl.gesture({ fingers = 3, direction = "up", action = "expo", mode = "on" })
 -- hl.gesture({ fingers = 3, direction = "down", action = "expo", mode = "off" })
 
+hl.config({
+    gestures = {
+        workspace_swipe_min_speed_to_force = 5
+    },
+})
+
 -- Example per-device config
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/ for more
 hl.device({
@@ -299,7 +305,7 @@ hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo()) -- dwindle
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle
 hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock")) -- lock the screen
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock")) -- lock the screen
 hl.bind("F11", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region")) -- screenshot
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy")) -- clipboard history
@@ -363,17 +369,12 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 hl.bind(mainMod .. " + ALT + mouse:272", hl.dsp.window.resize(), { mouse = true }) -- mainMod + Alt + LMB resizing for laptops
 
 -- Laptop multimedia keys for volume and LCD brightness
--- hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
--- hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
--- hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("swayosd-client --output-volume raise"), { repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("swayosd-client --output-volume lower"), { repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"), { locked = true, repeating = true })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, repeating = true })
--- hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
--- hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("swayosd-client --brightness raise"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("swayosd-client --brightness lower"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })

@@ -29,6 +29,7 @@
     nerd-fonts.jetbrains-mono
     nerd-fonts.hurmit
     nerd-fonts.arimo
+    nerd-fonts.go-mono
     nerd-fonts.symbols-only
     helvetica-neue-lt-std
   ];
