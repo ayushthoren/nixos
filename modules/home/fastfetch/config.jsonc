@@ -6,9 +6,9 @@
     "padding": {
       "top": 1,
       "left": 2,
-      "right": 2
+      "right": 3
     },
-    "width": 40,
+    "width": 38,
     "height": 20
   },
   "modules": [

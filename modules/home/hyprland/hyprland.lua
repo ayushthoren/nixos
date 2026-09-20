@@ -72,7 +72,7 @@ end)
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("XCURSOR_THEME", "Adwaita")
-hl.env("HYPRSHOT_DIR", "Screenshots")
+hl.env("HYPRSHOT_DIR", "Pictures/Screenshots")
 
 hl.env("XDG_SESSION_TYPE", "wayland")
 hl.env("WLR_NO_HARDWARE_CURSORS", "1")

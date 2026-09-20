@@ -13,7 +13,15 @@ let
 in
 {
   services.displayManager.ly.enable = true;
-  services.displayManager.ly.settings.waylandsessions = "${myWaylandSessions}/share/wayland-sessions";
+  services.displayManager.ly.settings = {
+    waylandsessions = "${myWaylandSessions}/share/wayland-sessions";
+    session_log = ".local/state/ly-session.log";
+  };
+
+  systemd.services.display-manager.serviceConfig = {
+    ExecStartPre = [ "${pkgs.procps}/bin/sysctl -w kernel.printk=0" ];
+    ExecStopPost = [ "${pkgs.procps}/bin/sysctl -w kernel.printk=4" ];
+  };
 
   programs.hyprland = {
     enable = true;
