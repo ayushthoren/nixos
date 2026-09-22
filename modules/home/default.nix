@@ -8,6 +8,7 @@
     ./fastfetch
     ./rofi
     ./wallust
+    ./quickshell
     ./zsh
     ./firefox
   ];
