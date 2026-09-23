@@ -30,10 +30,12 @@
     settings = {
       battery = {
         governor = "powersave";
+        energy_performance_preference = "balance_power";
         turbo = "never";
       };
       charger = {
-        governor = "performance";
+        governor = "powersave";
+        energy_performance_preference = "performance";
         turbo = "auto";
       };
     };

@@ -42,13 +42,12 @@
     settings = {
       battery = {
         governor = "powersave";
-        energy_performance_preference = "power";
-        # 2.5 GHz ceiling
-        scaling_max_freq = 2500000;
+        energy_performance_preference = "balance_power";
+        # scaling_max_freq = 2500000; # 2.5 GHz ceiling
         turbo = "never";
       };
       charger = {
-        governor = "performance";
+        governor = "powersave";
         energy_performance_preference = "performance";
         turbo = "auto";
       };
