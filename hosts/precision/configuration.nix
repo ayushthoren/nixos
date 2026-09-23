@@ -27,7 +27,7 @@
   #   "i915.enable_psr2_sel_fetch=0"
   # ];
 
-  cachyosKernel.enable = true;
+  cachyosKernel.enable = "v4";
   ollama.enable = true;
 
   # Default profile uses integrated-only for battery

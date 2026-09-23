@@ -18,7 +18,7 @@
     NIXOS_FLAKE_HOST = "spectre";
   };
 
-  cachyosKernel.enable = true;
+  cachyosKernel.enable = "v3";
 
   legacyBootloader.enable = true;
 

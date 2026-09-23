@@ -20,7 +20,7 @@
     NIXOS_FLAKE_HOST = "desktop";
   };
 
-  cachyosKernel.enable = true;
+  cachyosKernel.enable = "zen4";
   nvidia.enable = true;
   ollama.enable = true;
 
