@@ -8,6 +8,7 @@
 
     defaultSopsFile = ../../secrets/${hostname}.yaml;
 
+    secrets.tailscale_oauth_secret = { sopsFile = ../../secrets/shared.yaml; };
     secrets.ssh_private_key = {
       owner = username;
       mode = "0600";
