@@ -11,7 +11,7 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    
+
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
@@ -21,6 +21,11 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, hyprland, nix-flatpak, ... } @ inputs:
@@ -34,7 +39,7 @@
           ./hosts/${hostname}/configuration.nix
         ];
         specialArgs = { 
-          inherit username inputs; 
+          inherit username inputs hostname;
         };
       };
     in

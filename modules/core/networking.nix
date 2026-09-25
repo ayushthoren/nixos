@@ -8,12 +8,12 @@
 
   hardware.bluetooth.enable = true;
 
-  services.openssh = {
-    enable = false;
-    ports = [ 22 ];
-    settings = {
-      PasswordAuthentication = true;
-      PermitRootLogin = "yes";
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    publish = {
+      enable = true;
+      addresses = true;
     };
   };
 }

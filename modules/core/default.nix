@@ -7,6 +7,8 @@
     ./cachyos-kernel.nix
     ./locale.nix
     ./networking.nix
+    ./secrets.nix
+    ./ssh.nix
     ./nvidia.nix
     ./ollama.nix
     ./overlays.nix
