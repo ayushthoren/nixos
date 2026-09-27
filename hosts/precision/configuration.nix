@@ -28,6 +28,7 @@
   # ];
 
   cachyosKernel.enable = "v4";
+  secrets = true;
   ollama.enable = true;
 
   # Default profile uses integrated-only for battery

@@ -1,29 +1,33 @@
-{ config, inputs, pkgs, username, hostname, ... }:
+{ config, inputs, lib, pkgs, username, hostname, ... }:
 
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];
 
-  sops = {
-    age.keyFile = "/etc/sops/age/keys.txt";
+  options.secrets = lib.mkEnableOption "SOPS-managed secrets";
 
-    defaultSopsFile = ../../secrets/${hostname}.yaml;
+  config = lib.mkIf config.secrets {
+    sops = {
+      age.keyFile = "/etc/sops/age/keys.txt";
 
-    secrets.tailscale_oauth_secret = { sopsFile = ../../secrets/shared.yaml; };
-    secrets.ssh_private_key = {
-      owner = username;
-      mode = "0600";
+      defaultSopsFile = ../../secrets/${hostname}.yaml;
+
+      secrets.tailscale_oauth_secret = { sopsFile = ../../secrets/shared.yaml; };
+      secrets.ssh_private_key = {
+        owner = username;
+        mode = "0600";
+      };
     };
+
+    environment.systemPackages = with pkgs; [
+      age
+      sops
+    ];
+
+    programs.ssh.extraConfig = ''
+      Host *
+        IdentityFile ${config.sops.secrets.ssh_private_key.path}
+    '';
   };
-
-  environment.systemPackages = with pkgs; [
-    age
-    sops
-  ];
-
-  programs.ssh.extraConfig = ''
-    Host *
-      IdentityFile ${config.sops.secrets.ssh_private_key.path}
-  '';
 }
 
 /*

@@ -19,6 +19,7 @@
   };
 
   cachyosKernel.enable = "v3";
+  secrets = true;
 
   legacyBootloader.enable = true;
 

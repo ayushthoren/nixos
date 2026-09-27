@@ -21,6 +21,7 @@
   };
 
   cachyosKernel.enable = "zen4";
+  secrets = true;
   nvidia.enable = true;
   ollama.enable = true;
 

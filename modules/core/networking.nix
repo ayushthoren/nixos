@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   networking.networkmanager.enable = true;
@@ -25,7 +25,7 @@
     openFirewall = true;
   };
 
-  systemd.services.tailscale-autoconnect = {
+  systemd.services.tailscale-autoconnect = lib.mkIf config.secrets {
     wantedBy = [ "multi-user.target" ];
     after = [ "tailscaled.service" "network-online.target" ];
     wants = [ "network-online.target" ];
