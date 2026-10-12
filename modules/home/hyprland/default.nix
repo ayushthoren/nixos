@@ -1,4 +1,4 @@
-{ lib, config, inputs, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 {
   options = {
     hyprland.performanceMode = lib.mkOption {
@@ -35,8 +35,8 @@
     
     wayland.windowManager.hyprland = {
       enable = true;
-      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-      portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+      package = pkgs.hyprland;
+      portalPackage = pkgs.xdg-desktop-portal-hyprland;
       configType = "lua";
       extraConfig = "--"; # Silence warning
     };

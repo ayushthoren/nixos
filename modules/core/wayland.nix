@@ -1,7 +1,7 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 let
-  hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-  hyprlandPortalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  hyprlandPackage = pkgs.hyprland;
+  hyprlandPortalPackage = pkgs.xdg-desktop-portal-hyprland;
 
   # Create a custom sessions directory to prevent the UWSM one from showing up
   myWaylandSessions = pkgs.runCommand "my-wayland-sessions" { } ''
