@@ -37,6 +37,12 @@ PanelWindow {
         interval: 5000
     }
 
+    VolumeListener {
+        id: volumeFallback
+        enabled: !bar.audio
+        sinkId: Pipewire.defaultAudioSink?.id ?? null
+    }
+
     Process {
         id: identity
         command: [ "sh", "-c", "printf '%s@%s' \"$USER\" \"$(hostname)\"" ]
@@ -49,8 +55,11 @@ PanelWindow {
     property string sessionIdentity: ""
     property var palette: theme.palette
     readonly property var audio: Pipewire.defaultAudioSink?.audio ?? null
-    readonly property string volumeLabel: !audio ? "N/A"
-        : `${Math.round(audio.volume * 100)}${audio.muted ? "M" : ""}`
+    readonly property string volumeLabel: {
+        if (audio) return `${Math.round(audio.volume * 100)}${audio.muted ? "M" : ""}`;
+        const match = /^Volume:\s+([0-9]+(?:\.[0-9]+)?)(\s+\[MUTED\])?$/.exec(volumeFallback.value);
+        return match ? `${Math.round(Number(match[1]) * 100)}${match[2] ? "M" : ""}` : "N/A";
+    }
     readonly property var activeDevice: Networking.devices.values.find(device => device.connected) ?? null
     readonly property var activeNetwork: activeDevice?.network ?? activeDevice?.networks?.values.find(network => network.connected) ?? null
     readonly property var focusedWorkspace: Hyprland.focusedWorkspace
