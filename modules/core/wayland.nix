@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, inputs, pkgs, ... }:
 let
   hyprlandPackage = pkgs.hyprland;
   hyprlandPortalPackage = pkgs.xdg-desktop-portal-hyprland;
@@ -9,9 +9,16 @@ let
 
     ln -s ${hyprlandPackage}/share/wayland-sessions/hyprland.desktop \
       $out/share/wayland-sessions/hyprland.desktop
+
+    ln -s ${config.programs.mango.package}/share/wayland-sessions/mango.desktop \
+      $out/share/wayland-sessions/mango.desktop
   '';
 in
 {
+  imports = [ inputs.mangowm.nixosModules.mango ];
+
+  programs.mango.enable = true;
+
   services.displayManager.ly.enable = true;
   services.displayManager.ly.settings = {
     waylandsessions = "${myWaylandSessions}/share/wayland-sessions";

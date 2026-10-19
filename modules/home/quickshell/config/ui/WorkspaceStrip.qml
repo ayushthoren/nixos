@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 
@@ -7,6 +6,7 @@ Rectangle {
     id: root
     required property QtObject theme
     required property var palette
+    required property var compositor
 
     implicitWidth: row.implicitWidth + theme.pillHorizontalPadding
     implicitHeight: theme.barHeight
@@ -18,14 +18,14 @@ Rectangle {
         spacing: 0
 
         Repeater {
-            model: Hyprland.workspaces
+            model: root.compositor.workspaces
 
             Rectangle {
                 readonly property bool shown: modelData.active
                     || modelData.focused
                     || modelData.urgent
                     || modelData.hasFullscreen
-                    || ((modelData.toplevels?.values.length ?? 0) > 0)
+                    || ((modelData.windowCount ?? modelData.toplevels?.values.length ?? 0) > 0)
 
                 implicitWidth: shown ? label.implicitWidth + theme.workspaceHorizontalPadding : 0
                 implicitHeight: theme.barHeight
@@ -45,7 +45,7 @@ Rectangle {
                     anchors.fill: parent
                     enabled: parent.visible
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = "${modelData.id}" })`)
+                    onClicked: root.compositor.focusWorkspace(modelData.id)
                 }
             }
         }

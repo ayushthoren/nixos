@@ -3,7 +3,6 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 
-import Quickshell.Hyprland
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
@@ -19,6 +18,8 @@ PanelWindow {
     anchors { top: true; left: true; right: true }
     implicitHeight: theme.barHeight
     color: palette.background
+
+    CompositorState { id: compositor }
 
     SystemClock {
         id: clock
@@ -62,9 +63,7 @@ PanelWindow {
     }
     readonly property var activeDevice: Networking.devices.values.find(device => device.connected) ?? null
     readonly property var activeNetwork: activeDevice?.network ?? activeDevice?.networks?.values.find(network => network.connected) ?? null
-    readonly property var focusedWorkspace: Hyprland.focusedWorkspace
-    readonly property bool focusedWorkspaceEmpty: (focusedWorkspace?.toplevels?.values.length ?? 0) === 0
-    readonly property string focusedTitle: (!focusedWorkspaceEmpty && Hyprland.activeToplevel?.title ? Hyprland.activeToplevel.title : (sessionIdentity || "~"))
+    readonly property string focusedTitle: (!compositor.focusedWorkspaceEmpty && compositor.focusedTitle ? compositor.focusedTitle : (sessionIdentity || "~"))
     readonly property var player: Mpris.players.values.find(p => p.isPlaying) ?? Mpris.players.values[0] ?? null
     readonly property string playerLabel: { if (!player) {return "";} const title = player.trackTitle || ""; const artist = player.trackArtist || ""; return artist ? `${artist} - ${title}` : title; }
     readonly property bool batteryCharging: batteryPower.value === "1"
@@ -106,7 +105,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 0
 
-        WorkspaceStrip { theme: bar.theme; palette: bar.palette }
+        WorkspaceStrip { theme: bar.theme; palette: bar.palette; compositor: compositor }
         Pill {
             id: mediaPill
             label: bar.playerLabel

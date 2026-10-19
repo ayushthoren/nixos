@@ -4,6 +4,7 @@
     ./theming.nix
     ./kitty
     ./hyprland
+    ./mango
     ./waypaper
     ./fastfetch
     ./rofi
