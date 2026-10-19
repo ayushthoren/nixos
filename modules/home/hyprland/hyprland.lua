@@ -29,6 +29,8 @@ hl.monitor({
     position = "auto",
     scale = "auto",
 })
+local stateHome = os.getenv("XDG_STATE_HOME") or (home .. "/.local/state")
+pcall(dofile, stateHome .. "/quickshell/monitors.lua")
 
 hl.config({
     xwayland = {
@@ -307,6 +309,7 @@ hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle
 hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock")) -- lock the screen
 hl.bind("F11", hl.dsp.window.fullscreen())
+hl.bind("F8", hl.dsp.exec_cmd("qs ipc call display toggle"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region")) -- screenshot
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy")) -- clipboard history
 hl.bind(mainMod .. " + backslash", hl.dsp.exec_cmd("rofi -show calc -modi calc -no-show-match -no-sort")) -- calculator

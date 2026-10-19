@@ -166,6 +166,24 @@ PanelWindow {
         }
     }
 
+    Item {
+        id: displayAnchor
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.min(430, bar.width)
+        height: bar.height
+    }
+
+    DisplayPopup {
+        id: displayPopup
+        theme: bar.theme
+        anchorItem: displayAnchor
+    }
+
+    IpcHandler {
+        target: "display"
+        function toggle(): void { displayPopup.toggle(); }
+    }
+
     MediaPopup {
         id: mediaDropdown
         theme: bar.theme
