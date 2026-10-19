@@ -1,104 +1,37 @@
-import Quickshell
-import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 
-import Quickshell.Hyprland
-import Quickshell.Services.Mpris
-import Quickshell.Services.Pipewire
+import Quickshell
 import Quickshell.Services.SystemTray
-import Quickshell.Networking
 
-import "../utils"
+import ".."
+import "../services"
+import "components"
 
 PanelWindow {
     id: bar
     required property var lockScreen
-    required property QtObject theme
+    required property Theme theme
 
-    anchors { top: true; left: true; right: true }
-    implicitHeight: theme.barHeight
+    anchors {
+        top: true
+        left: true
+        right: true
+    }
+    implicitHeight: bar.theme.barHeight
     color: palette.background
 
-    SystemClock {
-        id: clock
-        precision: SystemClock.Seconds
+    BarStatus {
+        id: status
     }
+    readonly property var palette: bar.theme.palette
 
-    CommandPoller {
-        id: batteryCapacity
-        command: [ "sh", "-c", "[ -f /sys/class/power_supply/BAT0/capacity ] && cat /sys/class/power_supply/BAT0/capacity" ]
-        interval: 5000
-    }
-
-    CommandPoller {
-        id: batteryPower
-        command: [ "sh", "-c", "[ -f /sys/class/power_supply/AC/online ] && cat /sys/class/power_supply/AC/online" ]
-        interval: 5000
-    }
-
-    VolumeListener {
-        id: volumeFallback
-        enabled: !bar.audio
-        sinkId: Pipewire.defaultAudioSink?.id ?? null
-    }
-
-    Process {
-        id: identity
-        command: [ "sh", "-c", "printf '%s@%s' \"$USER\" \"$(hostname)\"" ]
-        running: true
-        stdout: StdioCollector {
-            onStreamFinished: sessionIdentity = this.text.trim()
+    function togglePopup(popup) {
+        for (const other of [mediaDropdown, trayDropdown, powerMenu]) {
+            if (other !== popup && other.visible)
+                other.closeAnimated();
         }
-    }
-
-    property string sessionIdentity: ""
-    property var palette: theme.palette
-    readonly property var audio: Pipewire.defaultAudioSink?.audio ?? null
-    readonly property string volumeLabel: {
-        if (audio) return `${Math.round(audio.volume * 100)}${audio.muted ? "M" : ""}`;
-        const match = /^Volume:\s+([0-9]+(?:\.[0-9]+)?)(\s+\[MUTED\])?$/.exec(volumeFallback.value);
-        return match ? `${Math.round(Number(match[1]) * 100)}${match[2] ? "M" : ""}` : "N/A";
-    }
-    readonly property var activeDevice: Networking.devices.values.find(device => device.connected) ?? null
-    readonly property var activeNetwork: activeDevice?.network ?? activeDevice?.networks?.values.find(network => network.connected) ?? null
-    readonly property var focusedWorkspace: Hyprland.focusedWorkspace
-    readonly property bool focusedWorkspaceEmpty: (focusedWorkspace?.toplevels?.values.length ?? 0) === 0
-    readonly property string focusedTitle: (!focusedWorkspaceEmpty && Hyprland.activeToplevel?.title ? Hyprland.activeToplevel.title : (sessionIdentity || "~"))
-    readonly property var player: Mpris.players.values.find(p => p.isPlaying) ?? Mpris.players.values[0] ?? null
-    readonly property string playerLabel: { if (!player) {return "";} const title = player.trackTitle || ""; const artist = player.trackArtist || ""; return artist ? `${artist} - ${title}` : title; }
-    readonly property bool batteryCharging: batteryPower.value === "1"
-    readonly property real batteryPercent: { const fileValue = Number(batteryCapacity.value); return Number.isFinite(fileValue) ? fileValue : NaN; }
-    readonly property bool hasBattery: Number.isFinite(batteryPercent)
-
-    component Pill: Rectangle {
-        id: pill
-        property string label: ""
-        property int maxLabelWidth: 400
-
-        implicitWidth: pillRow.implicitWidth + bar.theme.pillHorizontalPadding
-        implicitHeight: bar.theme.barHeight
-        color: bar.palette.surface
-
-        RowLayout {
-            id: pillRow
-            anchors.centerIn: parent
-            spacing: bar.theme.pillSpacing
-
-            Text {
-                text: pill.label
-                color: bar.palette.foreground
-                font.family: bar.theme.fontFamily
-                font.pixelSize: bar.theme.fontPixelSize
-                elide: Text.ElideRight
-                Layout.maximumWidth: pill.maxLabelWidth
-                visible: text !== ""
-            }
-        }
-    }
-
-    PwObjectTracker {
-        objects: [ Pipewire.defaultAudioSink ]
+        popup.toggle();
     }
 
     RowLayout {
@@ -106,26 +39,23 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 0
 
-        WorkspaceStrip { theme: bar.theme; palette: bar.palette }
-        Pill {
+        WorkspaceStrip {
+            theme: bar.theme
+        }
+        BarPill {
             id: mediaPill
-            label: bar.playerLabel
+            theme: bar.theme
+            label: status.playerLabel
             maxLabelWidth: 210
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (trayDropdown.visible) trayDropdown.closeAnimated();
-                    if (powerMenu.visible) powerMenu.closeAnimated();
-                    mediaDropdown.toggle();
-                }
-            }
+            interactive: true
+            onClicked: bar.togglePopup(mediaDropdown)
         }
     }
 
-    Pill {
+    BarPill {
+        theme: bar.theme
         anchors.centerIn: parent
-        label: bar.focusedTitle
+        label: status.focusedTitle
         maxLabelWidth: 700
     }
 
@@ -134,35 +64,40 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 0
 
-        Pill {
+        BarPill {
             id: trayPill
+            theme: bar.theme
             label: `V(${SystemTray.items.values.length})`
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (mediaDropdown.visible) mediaDropdown.closeAnimated();
-                    if (powerMenu.visible) powerMenu.closeAnimated();
-                    trayDropdown.toggle();
-                }
-            }
+            interactive: true
+            onClicked: bar.togglePopup(trayDropdown)
         }
-        Pill { label: bar.volumeLabel }
-        Pill { label: bar.activeNetwork?.name ?? (bar.activeDevice ? bar.activeDevice.name : "Disconnected") }
-        Pill { label: `${Math.round(bar.batteryPercent)}%${bar.batteryCharging ? "C" : ""}`; visible: bar.hasBattery }
-        Pill { label: Qt.formatDateTime(clock.date, "ddd dd MMM") }
-        Pill { label: Qt.formatDateTime(clock.date, "hh:mm:ss AP") }
-        Pill { label: ""
-            MouseArea {
-                id: powerButton
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    if (mediaDropdown.visible) mediaDropdown.closeAnimated();
-                    if (trayDropdown.visible) trayDropdown.closeAnimated();
-                    powerMenu.toggle();
-                }
-            }
+        BarPill {
+            theme: bar.theme
+            label: status.volumeLabel
+        }
+        BarPill {
+            theme: bar.theme
+            label: status.activeNetwork?.name ?? (status.activeDevice ? status.activeDevice.name : "Disconnected")
+        }
+        BarPill {
+            theme: bar.theme
+            label: `${Math.round(status.batteryPercent)}%${status.batteryCharging ? "C" : ""}`
+            visible: status.hasBattery
+        }
+        BarPill {
+            theme: bar.theme
+            label: Qt.formatDateTime(status.clockDate, "ddd dd MMM")
+        }
+        BarPill {
+            theme: bar.theme
+            label: Qt.formatDateTime(status.clockDate, "hh:mm:ss AP")
+        }
+        BarPill {
+            id: powerButton
+            theme: bar.theme
+            label: ""
+            interactive: true
+            onClicked: bar.togglePopup(powerMenu)
         }
     }
 
@@ -171,7 +106,7 @@ PanelWindow {
         theme: bar.theme
         colors: bar.palette
         anchorItem: mediaPill
-        player: bar.player
+        player: status.player
     }
 
     TrayPopup {

@@ -1,6 +1,7 @@
+import QtQuick
+
 import Quickshell
 import Quickshell.Io
-import QtQuick
 
 Scope {
     id: root
@@ -23,7 +24,8 @@ Scope {
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            if (!proc.running) proc.running = true;
+            if (!proc.running)
+                proc.running = true;
         }
     }
 }

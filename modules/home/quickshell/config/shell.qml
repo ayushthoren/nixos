@@ -5,7 +5,9 @@ import Quickshell.Io
 import "ui"
 
 ShellRoot {
-    Theme { id: theme }
+    Theme {
+        id: theme
+    }
 
     LockScreen {
         id: lockScreen

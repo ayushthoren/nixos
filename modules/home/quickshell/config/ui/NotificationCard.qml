@@ -1,59 +1,63 @@
 import QtQuick
-import Quickshell
-import QtQuick.Layouts
 import QtQuick.Controls
-import Quickshell.Widgets
+import QtQuick.Layouts
+
+import Quickshell
 import Quickshell.Services.Notifications
+
+import ".."
+import "components"
 
 Rectangle {
     id: root
 
-    required property QtObject theme
-    required property QtObject notification
+    required property Theme theme
+    required property Notification notification
     required property var colors
-    signal removeRequested()
+    signal removeRequested
 
     property bool visibleState: false
     property bool closing: false
     property string closeMode: ""
     property var closeAction: null
-    readonly property real popupHeight: content.implicitHeight + (theme.notificationPadding * 2)
-    readonly property bool hasSummary: notification.summary !== ""
-    readonly property bool hasBody: notification.body !== ""
-    readonly property string imageSource: resolveSource(
-        notification.hints?.["image-path"] || notification.hints?.image_path || notification.image)
-    readonly property string iconSource: resolveSource(notification.appIcon)
+    readonly property real popupHeight: content.implicitHeight + (root.theme.notificationPadding * 2)
+    readonly property bool hasSummary: root.notification.summary !== ""
+    readonly property bool hasBody: root.notification.body !== ""
+    readonly property string imageSource: resolveSource(root.notification.hints?.["image-path"] || root.notification.hints?.image_path || root.notification.image)
+    readonly property string iconSource: resolveSource(root.notification.appIcon)
     readonly property bool hasImage: imageSource !== "" && imageProbe.status === Image.Ready
-    readonly property bool avatarImage: hasImage && imageProbe.sourceSize.width <= 256
-        && imageProbe.sourceSize.height <= 256
-        && imageProbe.sourceSize.width / Math.max(1, imageProbe.sourceSize.height) > 0.75
-        && imageProbe.sourceSize.width / Math.max(1, imageProbe.sourceSize.height) < 1.33
+    readonly property bool avatarImage: hasImage && imageProbe.sourceSize.width <= 256 && imageProbe.sourceSize.height <= 256 && imageProbe.sourceSize.width / Math.max(1, imageProbe.sourceSize.height) > 0.75 && imageProbe.sourceSize.width / Math.max(1, imageProbe.sourceSize.height) < 1.33
     readonly property bool hasIcon: iconSource !== "" && appIcon.status === Image.Ready
     property real remainingMs: timeoutMs
     property real lastTickMs: 0
     readonly property int timeoutMs: {
-        if (notification.expireTimeout > 0) {
-            return Math.round(notification.expireTimeout);
+        if (root.notification.expireTimeout > 0) {
+            return Math.round(root.notification.expireTimeout);
         }
 
-        if (notification.urgency === NotificationUrgency.Critical) return 10000;
-        return notification.urgency === NotificationUrgency.Low ? 4000 : 6000;
+        if (root.notification.urgency === NotificationUrgency.Critical)
+            return 10000;
+        return root.notification.urgency === NotificationUrgency.Low ? 4000 : 6000;
     }
 
     height: popupHeight
-    x: visibleState && !closing ? 0 : width + theme.notificationSlideDistance
+    x: visibleState && !closing ? 0 : width + root.theme.notificationSlideDistance
     opacity: visibleState && !closing ? 1 : 0
-    color: colors.surface
+    color: root.colors.surface
     border.width: 1
     border.color: accentColor()
 
     function resolveSource(value) {
         const source = String(value || "");
-        if (!source) return "";
-        if (source.startsWith("/")) return "file://" + source;
-        if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(source)) return source;
+        if (!source)
+            return "";
+        if (source.startsWith("/"))
+            return "file://" + source;
+        if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(source))
+            return source;
         const home = Quickshell.env("HOME") || "";
-        if (source.startsWith("~/")) return "file://" + home + source.slice(1);
+        if (source.startsWith("~/"))
+            return "file://" + home + source.slice(1);
         if (source.includes("/") || /\.(png|jpe?g|webp|gif|svg)$/i.test(source)) {
             return "file://" + home + "/" + source;
         }
@@ -65,38 +69,46 @@ Rectangle {
         visibleState = true;
     }
     function restartTimeout() {
+        finishTimer.stop();
+        closing = false;
+        closeMode = "";
+        closeAction = null;
+        visibleState = true;
         remainingMs = timeoutMs;
         lastTickMs = Date.now();
     }
 
     Behavior on x {
         NumberAnimation {
-            duration: theme.notificationSlideDuration
+            duration: root.theme.notificationSlideDuration
             easing.type: Easing.OutCubic
         }
     }
 
     Behavior on opacity {
-        NumberAnimation { duration: 130; easing.type: Easing.OutQuad }
+        NumberAnimation {
+            duration: 130
+            easing.type: Easing.OutQuad
+        }
     }
 
     Behavior on y {
         NumberAnimation {
-            duration: theme.notificationSlideDuration + 50
+            duration: root.theme.notificationSlideDuration + 50
             easing.type: Easing.OutCubic
         }
     }
 
     function accentColor() {
-        if (notification.urgency === NotificationUrgency.Critical) {
-            return colors.critical;
+        if (root.notification.urgency === NotificationUrgency.Critical) {
+            return root.colors.critical;
         }
 
-        if (notification.urgency === NotificationUrgency.Low) {
-            return colors.low;
+        if (root.notification.urgency === NotificationUrgency.Low) {
+            return root.colors.low;
         }
 
-        return colors.border;
+        return root.colors.border;
     }
 
     function beginClose(mode, action) {
@@ -116,7 +128,7 @@ Rectangle {
     }
 
     function invokeAction(action) {
-        if (notification.resident) {
+        if (root.notification.resident) {
             action.invoke();
             return;
         }
@@ -125,17 +137,18 @@ Rectangle {
     }
 
     function sendReply() {
-        if (!notification.hasInlineReply || !replyField.text.trim()) return;
+        if (!root.notification.hasInlineReply || !replyField.text.trim())
+            return;
         const reply = replyField.text;
         replyField.clear();
-        notification.sendInlineReply(reply);
+        root.notification.sendInlineReply(reply);
     }
 
     function finishClose() {
         if (closeMode === "expire") {
-            notification.expire();
+            root.notification.expire();
         } else if (closeMode === "dismiss") {
-            notification.dismiss();
+            root.notification.dismiss();
         } else if (closeMode === "action" && closeAction) {
             closeAction.invoke();
         }
@@ -153,18 +166,19 @@ Rectangle {
             const now = Date.now();
             root.remainingMs = Math.max(0, root.remainingMs - (now - root.lastTickMs));
             root.lastTickMs = now;
-            if (root.remainingMs <= 0) root.closeNotification(true);
+            if (root.remainingMs <= 0)
+                root.closeNotification(true);
         }
     }
 
     Timer {
         id: finishTimer
-        interval: theme.notificationSlideDuration
+        interval: root.theme.notificationSlideDuration
         onTriggered: root.finishClose()
     }
 
     Connections {
-        target: notification
+        target: root.notification
 
         function onClosed() {
             root.removeRequested();
@@ -180,12 +194,12 @@ Rectangle {
     ColumnLayout {
         id: content
         anchors.fill: parent
-        anchors.margins: theme.notificationPadding
-        spacing: theme.notificationSpacing
+        anchors.margins: root.theme.notificationPadding
+        spacing: root.theme.notificationSpacing
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: theme.notificationSpacing
+            spacing: root.theme.notificationSpacing
 
             Rectangle {
                 Layout.alignment: Qt.AlignTop
@@ -205,13 +219,12 @@ Rectangle {
                     visible: status === Image.Ready
                 }
 
-                Text {
+                ThemedText {
+                    theme: root.theme
                     anchors.centerIn: parent
                     visible: !root.hasIcon && !root.avatarImage
-                    text: notification.urgency === NotificationUrgency.Critical ? "!" : "•"
-                    color: colors.activeForeground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
+                    text: root.notification.urgency === NotificationUrgency.Critical ? "!" : "•"
+                    color: root.colors.activeForeground
                 }
             }
 
@@ -219,12 +232,11 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 2
 
-                Text {
+                ThemedText {
+                    theme: root.theme
                     Layout.fillWidth: true
-                    text: root.hasSummary ? notification.summary : notification.appName
-                    color: colors.foreground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
+                    text: root.hasSummary ? root.notification.summary : root.notification.appName
+
                     font.bold: true
                     wrapMode: Text.Wrap
                     maximumLineCount: 2
@@ -232,13 +244,14 @@ Rectangle {
                     textFormat: Text.PlainText
                 }
 
-                Text {
+                ThemedText {
+                    theme: root.theme
                     Layout.fillWidth: true
-                    visible: root.hasSummary && notification.appName !== ""
-                    text: notification.appName
-                    color: colors.mutedForeground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize - 1
+                    visible: root.hasSummary && root.notification.appName !== ""
+                    text: root.notification.appName
+                    color: root.colors.mutedForeground
+
+                    font.pixelSize: root.theme.fontPixelSize - 1
                     elide: Text.ElideRight
                     textFormat: Text.PlainText
                 }
@@ -249,13 +262,12 @@ Rectangle {
                 Layout.preferredWidth: closeLabel.implicitWidth
                 Layout.preferredHeight: closeLabel.implicitHeight
 
-                Text {
+                ThemedText {
                     id: closeLabel
+                    theme: root.theme
                     anchors.centerIn: parent
                     text: "󰅖"
-                    color: colors.mutedForeground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
+                    color: root.colors.mutedForeground
                 }
 
                 MouseArea {
@@ -266,18 +278,17 @@ Rectangle {
             }
         }
 
-        Text {
+        ThemedText {
+            theme: root.theme
             Layout.fillWidth: true
             visible: root.hasBody
-            text: notification.body
-            color: colors.foreground
-            font.family: theme.fontFamily
-            font.pixelSize: theme.fontPixelSize
+            text: root.notification.body
+
             wrapMode: Text.Wrap
             maximumLineCount: 8
             elide: Text.ElideRight
             textFormat: Text.RichText
-            onLinkActivated: Qt.openUrlExternally(link)
+            onLinkActivated: link => Qt.openUrlExternally(link)
         }
 
         Image {
@@ -299,25 +310,27 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            visible: notification.hasInlineReply
-            spacing: theme.notificationSpacing
+            visible: root.notification.hasInlineReply
+            spacing: root.theme.notificationSpacing
 
             TextField {
                 id: replyField
                 Layout.fillWidth: true
-                placeholderText: notification.inlineReplyPlaceholder || "Reply"
-                color: colors.foreground
-                font.family: theme.fontFamily
-                font.pixelSize: theme.fontPixelSize
-                background: Rectangle { color: colors.overlay; border.color: colors.border }
+                font.family: root.theme.fontFamily
+                placeholderText: root.notification.inlineReplyPlaceholder || "Reply"
+                color: root.colors.foreground
+                font.pixelSize: root.theme.fontPixelSize
+                background: Rectangle {
+                    color: root.colors.overlay
+                    border.color: root.colors.border
+                }
                 onAccepted: root.sendReply()
             }
 
-            Text {
+            ThemedText {
+                theme: root.theme
                 text: "Send"
-                color: colors.foreground
-                font.family: theme.fontFamily
-                font.pixelSize: theme.fontPixelSize
+
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
@@ -326,49 +339,13 @@ Rectangle {
             }
         }
 
-        Flow {
+        NotificationActions {
             Layout.fillWidth: true
-            visible: notification.actions.length > 0
-            spacing: 6
-
-            Repeater {
-                model: notification.actions
-
-                Rectangle {
-                    required property QtObject modelData
-
-                    implicitWidth: actionRow.implicitWidth + 12
-                    implicitHeight: 26
-                    color: colors.overlay
-
-                    Row {
-                        id: actionRow
-                        anchors.centerIn: parent
-                        spacing: 6
-
-                        IconImage {
-                            implicitSize: 14
-                            visible: notification.hasActionIcons
-                            source: notification.hasActionIcons ? modelData.identifier : ""
-                        }
-
-                        Text {
-                            text: modelData.text
-                            color: colors.foreground
-                            font.family: theme.fontFamily
-                            font.pixelSize: theme.fontPixelSize - 1
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.invokeAction(modelData)
-                    }
-                }
-            }
+            theme: root.theme
+            colors: root.colors
+            notification: root.notification
+            onInvoked: action => root.invokeAction(action)
         }
-
     }
 
     Rectangle {
@@ -384,7 +361,12 @@ Rectangle {
             height: parent.height
             width: parent.width * Math.max(0, Math.min(1, root.remainingMs / Math.max(1, root.timeoutMs)))
             color: root.colors.activeSurface
-            Behavior on width { NumberAnimation { duration: countdown.interval; easing.type: Easing.Linear } }
+            Behavior on width {
+                NumberAnimation {
+                    duration: countdown.interval
+                    easing.type: Easing.Linear
+                }
+            }
         }
     }
 }

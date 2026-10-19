@@ -1,15 +1,19 @@
-import Quickshell
-import Quickshell.Io
-import Quickshell.Services.Pam
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
 
+import Quickshell
+import Quickshell.Io
+import Quickshell.Services.Pam
+import Quickshell.Wayland
+
+import ".."
+import "components"
+
 Scope {
     id: root
 
-    required property QtObject theme
+    required property Theme theme
 
     property string hostname: ""
     property string pendingPassword: ""
@@ -26,14 +30,14 @@ Scope {
 
     readonly property int animationDuration: 350
     readonly property int backgroundAnimationDuration: 450
-    readonly property var colors: theme.palette
-    readonly property string identity:
-        `${Quickshell.env("USER") || "user"}@${hostname || "localhost"}`
+    readonly property var colors: root.theme.palette
+    readonly property string identity: `${Quickshell.env("USER") || "user"}@${hostname || "localhost"}`
 
-    signal resetInput()
+    signal resetInput
 
     function lock() {
-        if (sessionLock.locked || preparingLock) return;
+        if (sessionLock.locked || preparingLock)
+            return;
 
         unlockAnimation.stop();
         contentVisible = false;
@@ -52,7 +56,8 @@ Scope {
     }
 
     function finishLockPreparation() {
-        if (!preparingLock) return;
+        if (!preparingLock)
+            return;
         preparationTimeout.stop();
         preparingLock = false;
         transitionVisible = true;
@@ -70,7 +75,8 @@ Scope {
 
     function setWallpaperFromQuery(output) {
         const match = output.match(/currently displaying:\s*image:\s*(.+)\s*$/m);
-        if (!match) return;
+        if (!match)
+            return;
 
         wallpaperSource = "";
         const path = match[1].trim();
@@ -78,12 +84,14 @@ Scope {
     }
 
     function authenticate(candidate) {
-        if (!candidate || authenticating) return;
+        if (!candidate || authenticating)
+            return;
 
         pendingPassword = candidate;
         statusMessage = "";
         authenticating = true;
-        if (!pam.start()) authenticationFailed("Authentication unavailable");
+        if (!pam.start())
+            authenticationFailed("Authentication unavailable");
     }
 
     function authenticationFailed(message) {
@@ -94,14 +102,16 @@ Scope {
     }
 
     Process {
-        command: [ "hostname" ]
+        command: ["hostname"]
         running: true
-        stdout: StdioCollector { onStreamFinished: root.hostname = text.trim() }
+        stdout: StdioCollector {
+            onStreamFinished: root.hostname = text.trim()
+        }
     }
 
     Process {
         id: wallpaperQuery
-        command: [ "awww", "query" ]
+        command: ["awww", "query"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: root.setWallpaperFromQuery(text)
@@ -186,8 +196,10 @@ Scope {
         config: "login"
 
         onPamMessage: {
-            if (responseRequired) respond(root.pendingPassword);
-            else if (messageIsError) root.statusMessage = message;
+            if (responseRequired)
+                respond(root.pendingPassword);
+            else if (messageIsError)
+                root.statusMessage = message;
         }
         onCompleted: result => {
             root.pendingPassword = "";
@@ -207,7 +219,9 @@ Scope {
     SequentialAnimation {
         id: unlockAnimation
 
-        PauseAnimation { duration: root.animationDuration + 20 }
+        PauseAnimation {
+            duration: root.animationDuration + 20
+        }
         ScriptAction {
             script: sessionLock.locked = false
         }
@@ -291,7 +305,7 @@ Scope {
 
                 SystemClock {
                     id: clock
-                    precision: SystemClock.Seconds
+                    precision: SystemClock.Minutes
                 }
 
                 ColumnLayout {
@@ -299,21 +313,19 @@ Scope {
                     width: Math.min(360, parent.width - 40)
                     spacing: 0
 
-                    Text {
+                    ThemedText {
+                        theme: root.theme
                         Layout.alignment: Qt.AlignHCenter
                         text: Qt.formatDateTime(clock.date, "h:mm AP")
-                        color: root.colors.foreground
-                        font.family: root.theme.fontFamily
                         font.pixelSize: 48
                         font.bold: true
                     }
-                    Text {
+                    ThemedText {
+                        theme: root.theme
                         Layout.alignment: Qt.AlignHCenter
                         Layout.topMargin: 2
                         text: Qt.formatDateTime(clock.date, "dddd, dd MMMM yyyy")
                         color: root.colors.mutedForeground
-                        font.family: root.theme.fontFamily
-                        font.pixelSize: root.theme.fontPixelSize
                     }
                     Rectangle {
                         Layout.fillWidth: true
@@ -322,18 +334,16 @@ Scope {
                         clip: true
                         color: root.colors.surface
                         border.width: 1
-                        border.color: passwordInput.activeFocus
-                            ? root.colors.activeSurface : root.colors.border
+                        border.color: passwordInput.activeFocus ? root.colors.activeSurface : root.colors.border
 
-                        Text {
+                        ThemedText {
+                            theme: root.theme
                             anchors.left: parent.left
                             anchors.leftMargin: 12
                             anchors.verticalCenter: parent.verticalCenter
                             visible: passwordInput.text.length === 0
                             text: "Password"
                             color: root.colors.mutedForeground
-                            font.family: root.theme.fontFamily
-                            font.pixelSize: root.theme.fontPixelSize
                         }
                         TextInput {
                             id: passwordInput
@@ -344,8 +354,8 @@ Scope {
                             color: root.colors.foreground
                             selectionColor: root.colors.activeSurface
                             selectedTextColor: root.colors.activeForeground
-                            font.family: root.theme.fontFamily
                             font.pixelSize: root.theme.fontPixelSize * 1.5
+                            font.family: root.theme.fontFamily
                             echoMode: TextInput.Password
                             passwordCharacter: "•"
                             enabled: !root.authenticating
@@ -362,23 +372,21 @@ Scope {
                             }
                         }
                     }
-                    Text {
+                    ThemedText {
+                        theme: root.theme
                         Layout.alignment: Qt.AlignHCenter
                         Layout.topMargin: 10
                         text: root.identity
                         color: root.colors.mutedForeground
-                        font.family: root.theme.fontFamily
-                        font.pixelSize: root.theme.fontPixelSize
                     }
-                    Text {
+                    ThemedText {
+                        theme: root.theme
                         Layout.alignment: Qt.AlignHCenter
                         Layout.topMargin: 8
                         Layout.preferredHeight: 18
                         opacity: root.authenticating || root.statusMessage !== "" ? 1 : 0
                         text: root.authenticating ? "Authenticating…" : root.statusMessage
-                        color: root.statusMessage !== ""
-                            ? root.colors.critical : root.colors.mutedForeground
-                        font.family: root.theme.fontFamily
+                        color: root.statusMessage !== "" ? root.colors.critical : root.colors.mutedForeground
                         font.pixelSize: root.theme.fontPixelSize - 1
                     }
                 }

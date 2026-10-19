@@ -1,16 +1,19 @@
-import Quickshell
-import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 
+import Quickshell.Hyprland
+
+import ".."
+import "components"
+
 Rectangle {
     id: root
-    required property QtObject theme
-    required property var palette
+    required property Theme theme
+    readonly property var colors: theme.palette
 
-    implicitWidth: row.implicitWidth + theme.pillHorizontalPadding
-    implicitHeight: theme.barHeight
-    color: palette.surface
+    implicitWidth: row.implicitWidth + root.theme.pillHorizontalPadding
+    implicitHeight: root.theme.barHeight
+    color: colors.surface
 
     RowLayout {
         id: row
@@ -21,31 +24,30 @@ Rectangle {
             model: Hyprland.workspaces
 
             Rectangle {
-                readonly property bool shown: modelData.active
-                    || modelData.focused
-                    || modelData.urgent
-                    || modelData.hasFullscreen
-                    || ((modelData.toplevels?.values.length ?? 0) > 0)
+                id: workspace
+                // Keep ObjectModel data dynamic: typed workspace pointers lose
+                // their properties in this Quickshell build.
+                required property var modelData
+                readonly property bool shown: workspace.modelData.active || workspace.modelData.focused || workspace.modelData.urgent || workspace.modelData.hasFullscreen || ((workspace.modelData.toplevels?.values.length ?? 0) > 0)
 
-                implicitWidth: shown ? label.implicitWidth + theme.workspaceHorizontalPadding : 0
-                implicitHeight: theme.barHeight
+                implicitWidth: shown ? label.implicitWidth + root.theme.workspaceHorizontalPadding : 0
+                implicitHeight: root.theme.barHeight
                 visible: shown
-                color: modelData.active ? root.palette.activeSurface : root.palette.surface
+                color: workspace.modelData.active ? root.colors.activeSurface : root.colors.surface
 
-                Text {
+                ThemedText {
                     id: label
+                    theme: root.theme
                     anchors.centerIn: parent
-                    text: modelData.id
-                    color: modelData.active ? root.palette.activeForeground : root.palette.foreground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
+                    text: workspace.modelData.id
+                    color: workspace.modelData.active ? root.colors.activeForeground : root.colors.foreground
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     enabled: parent.visible
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = "${modelData.id}" })`)
+                    onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = "${workspace.modelData.id}" })`)
                 }
             }
         }

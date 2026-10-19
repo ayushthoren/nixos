@@ -1,6 +1,7 @@
+import QtQuick
+
 import Quickshell
 import Quickshell.Io
-import QtQuick
 
 Scope {
     id: root
@@ -11,15 +12,19 @@ Scope {
     property bool refreshPending: false
 
     function refresh(): void {
-        if (!enabled) return;
-        if (readVolume.running) refreshPending = true;
-        else readVolume.running = true;
+        if (!enabled)
+            return;
+        if (readVolume.running)
+            refreshPending = true;
+        else
+            readVolume.running = true;
     }
 
     onSinkIdChanged: refresh()
     onEnabledChanged: {
         monitor.running = enabled;
-        if (enabled) refresh();
+        if (enabled)
+            refresh();
         else {
             updates.stop();
             reconnect.stop();
@@ -29,7 +34,7 @@ Scope {
 
     Process {
         id: monitor
-        command: [ "pw-mon", "--no-colors", "--hide-props" ]
+        command: ["pw-mon", "--no-colors", "--hide-props"]
         running: root.enabled
         stdout: SplitParser {
             onRead: data => {
@@ -65,7 +70,7 @@ Scope {
 
     Process {
         id: readVolume
-        command: [ "wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@" ]
+        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
         stdout: StdioCollector {
             onStreamFinished: root.value = this.text.trim()
         }
