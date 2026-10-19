@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import "components"
 import QtQuick.Layouts
 
 import Quickshell.Hyprland
@@ -12,6 +13,7 @@ import Quickshell.Networking
 import "../utils"
 
 PanelWindow {
+    readonly property QtObject uiTheme: theme
     id: bar
     required property var lockScreen
     required property QtObject theme
@@ -85,7 +87,8 @@ PanelWindow {
             anchors.centerIn: parent
             spacing: bar.theme.pillSpacing
 
-            Text {
+            StyledText {
+                theme: uiTheme
                 text: pill.label
                 color: bar.palette.foreground
                 font.family: bar.theme.fontFamily

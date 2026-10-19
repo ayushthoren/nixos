@@ -1,9 +1,11 @@
 import Quickshell
 import Quickshell.Hyprland
 import QtQuick
+import "components"
 import QtQuick.Layouts
 
 Rectangle {
+    readonly property QtObject uiTheme: theme
     id: root
     required property QtObject theme
     required property var palette
@@ -32,13 +34,12 @@ Rectangle {
                 visible: shown
                 color: modelData.active ? root.palette.activeSurface : root.palette.surface
 
-                Text {
+                StyledText {
+                    theme: uiTheme
                     id: label
                     anchors.centerIn: parent
                     text: modelData.id
                     color: modelData.active ? root.palette.activeForeground : root.palette.foreground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
                 }
 
                 MouseArea {

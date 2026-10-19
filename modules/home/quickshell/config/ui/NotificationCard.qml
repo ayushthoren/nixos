@@ -1,8 +1,5 @@
 import QtQuick
 import Quickshell
-import QtQuick.Layouts
-import QtQuick.Controls
-import Quickshell.Widgets
 import Quickshell.Services.Notifications
 
 Rectangle {
@@ -23,12 +20,12 @@ Rectangle {
     readonly property string imageSource: resolveSource(
         notification.hints?.["image-path"] || notification.hints?.image_path || notification.image)
     readonly property string iconSource: resolveSource(notification.appIcon)
-    readonly property bool hasImage: imageSource !== "" && imageProbe.status === Image.Ready
-    readonly property bool avatarImage: hasImage && imageProbe.sourceSize.width <= 256
-        && imageProbe.sourceSize.height <= 256
-        && imageProbe.sourceSize.width / Math.max(1, imageProbe.sourceSize.height) > 0.75
-        && imageProbe.sourceSize.width / Math.max(1, imageProbe.sourceSize.height) < 1.33
-    readonly property bool hasIcon: iconSource !== "" && appIcon.status === Image.Ready
+    readonly property bool hasImage: imageSource !== "" && content.imageProbe.status === Image.Ready
+    readonly property bool avatarImage: hasImage && content.imageProbe.sourceSize.width <= 256
+        && content.imageProbe.sourceSize.height <= 256
+        && content.imageProbe.sourceSize.width / Math.max(1, content.imageProbe.sourceSize.height) > 0.75
+        && content.imageProbe.sourceSize.width / Math.max(1, content.imageProbe.sourceSize.height) < 1.33
+    readonly property bool hasIcon: iconSource !== "" && content.appIcon.status === Image.Ready
     property real remainingMs: timeoutMs
     property real lastTickMs: 0
     readonly property int timeoutMs: {
@@ -125,9 +122,9 @@ Rectangle {
     }
 
     function sendReply() {
-        if (!notification.hasInlineReply || !replyField.text.trim()) return;
-        const reply = replyField.text;
-        replyField.clear();
+        if (!notification.hasInlineReply || !content.replyField.text.trim()) return;
+        const reply = content.replyField.text;
+        content.replyField.clear();
         notification.sendInlineReply(reply);
     }
 
@@ -177,198 +174,9 @@ Rectangle {
         onHoveredChanged: root.lastTickMs = Date.now()
     }
 
-    ColumnLayout {
+    NotificationContent {
         id: content
-        anchors.fill: parent
-        anchors.margins: theme.notificationPadding
-        spacing: theme.notificationSpacing
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: theme.notificationSpacing
-
-            Rectangle {
-                Layout.alignment: Qt.AlignTop
-                Layout.preferredWidth: 32
-                Layout.preferredHeight: 32
-                visible: root.hasIcon || root.avatarImage || !root.hasImage
-                color: root.accentColor()
-
-                Image {
-                    id: appIcon
-                    anchors.centerIn: parent
-                    width: root.avatarImage ? 30 : 20
-                    height: width
-                    source: root.avatarImage ? root.imageSource : root.iconSource
-                    fillMode: Image.PreserveAspectFit
-                    asynchronous: true
-                    visible: status === Image.Ready
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: !root.hasIcon && !root.avatarImage
-                    text: notification.urgency === NotificationUrgency.Critical ? "!" : "•"
-                    color: colors.activeForeground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
-                }
-            }
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 2
-
-                Text {
-                    Layout.fillWidth: true
-                    text: root.hasSummary ? notification.summary : notification.appName
-                    color: colors.foreground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
-                    font.bold: true
-                    wrapMode: Text.Wrap
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
-                    textFormat: Text.PlainText
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    visible: root.hasSummary && notification.appName !== ""
-                    text: notification.appName
-                    color: colors.mutedForeground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize - 1
-                    elide: Text.ElideRight
-                    textFormat: Text.PlainText
-                }
-            }
-
-            Item {
-                Layout.alignment: Qt.AlignTop
-                Layout.preferredWidth: closeLabel.implicitWidth
-                Layout.preferredHeight: closeLabel.implicitHeight
-
-                Text {
-                    id: closeLabel
-                    anchors.centerIn: parent
-                    text: "󰅖"
-                    color: colors.mutedForeground
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.fontPixelSize
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.closeNotification(false)
-                }
-            }
-        }
-
-        Text {
-            Layout.fillWidth: true
-            visible: root.hasBody
-            text: notification.body
-            color: colors.foreground
-            font.family: theme.fontFamily
-            font.pixelSize: theme.fontPixelSize
-            wrapMode: Text.Wrap
-            maximumLineCount: 8
-            elide: Text.ElideRight
-            textFormat: Text.RichText
-            onLinkActivated: Qt.openUrlExternally(link)
-        }
-
-        Image {
-            id: imageProbe
-            visible: false
-            source: root.imageSource
-            asynchronous: true
-        }
-
-        Image {
-            Layout.fillWidth: true
-            Layout.preferredHeight: visible ? 160 : 0
-            visible: root.hasImage && !root.avatarImage
-            source: root.imageSource
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
-            clip: true
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            visible: notification.hasInlineReply
-            spacing: theme.notificationSpacing
-
-            TextField {
-                id: replyField
-                Layout.fillWidth: true
-                placeholderText: notification.inlineReplyPlaceholder || "Reply"
-                color: colors.foreground
-                font.family: theme.fontFamily
-                font.pixelSize: theme.fontPixelSize
-                background: Rectangle { color: colors.overlay; border.color: colors.border }
-                onAccepted: root.sendReply()
-            }
-
-            Text {
-                text: "Send"
-                color: colors.foreground
-                font.family: theme.fontFamily
-                font.pixelSize: theme.fontPixelSize
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.sendReply()
-                }
-            }
-        }
-
-        Flow {
-            Layout.fillWidth: true
-            visible: notification.actions.length > 0
-            spacing: 6
-
-            Repeater {
-                model: notification.actions
-
-                Rectangle {
-                    required property QtObject modelData
-
-                    implicitWidth: actionRow.implicitWidth + 12
-                    implicitHeight: 26
-                    color: colors.overlay
-
-                    Row {
-                        id: actionRow
-                        anchors.centerIn: parent
-                        spacing: 6
-
-                        IconImage {
-                            implicitSize: 14
-                            visible: notification.hasActionIcons
-                            source: notification.hasActionIcons ? modelData.identifier : ""
-                        }
-
-                        Text {
-                            text: modelData.text
-                            color: colors.foreground
-                            font.family: theme.fontFamily
-                            font.pixelSize: theme.fontPixelSize - 1
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.invokeAction(modelData)
-                    }
-                }
-            }
-        }
-
+        controller: root
     }
 
     Rectangle {

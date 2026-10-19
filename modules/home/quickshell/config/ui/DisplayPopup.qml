@@ -4,12 +4,11 @@ import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "components"
 
-PopupWindow {
+PopupFrame {
+    readonly property QtObject uiTheme: panel.theme
     id: panel
-    required property Item anchorItem
-    required property QtObject theme
-    readonly property var colors: theme.palette
     readonly property string helper: Quickshell.shellPath("utils/display-settings.py")
     property var monitors: []
     property var preferences: ({monitors: {}, night: {enabled: false, temperature: 4000}})
@@ -31,11 +30,8 @@ PopupWindow {
     property int temperature: 4000
     property bool nightEnabled: false
     property bool closing: false
-    property bool expanded: false
-    property bool slideOnClose: true
     readonly property bool busy: operation !== ""
     readonly property bool canEdit: initialized && previous === null && !busy
-    readonly property color inputBorder: Qt.alpha(colors.foreground, 0.25)
     readonly property var resolutions: {
         const modes = monitor?.availableModes ?? [];
         const sizes = modes.map(m => m.split("@")[0]);
@@ -66,18 +62,12 @@ PopupWindow {
             .map(m => m.split("@")[1]?.replace(/Hz$/, "") ?? ""))];
     }
 
-    visible: false
-    anchor.item: anchorItem
-    anchor.edges: Edges.Bottom | Edges.Left
-    anchor.gravity: Edges.Bottom | Edges.Right
-    anchor.margins.top: 6
-    grabFocus: true
+    alignRight: false
     implicitWidth: Math.min(430, screen ? screen.width : 430)
-    implicitHeight: Math.min(content.implicitHeight + 24, screen ? screen.height - theme.barHeight - 24 : 600)
+    implicitHeight: Math.min(content.implicitHeight + theme.popupPadding * 2, screen ? screen.height - theme.barHeight - 24 : 600)
     color: "transparent"
     onVisibleChanged: {
         if (!visible) {
-            expanded = false;
             dismissChoices();
             // Losing the grab must discard an unconfirmed preview too.
             if (previous) {
@@ -96,34 +86,21 @@ PopupWindow {
         refreshChoice.setValue(prefs.refresh ?? "");
         scaleInput.text = prefs.scale ?? "";
     }
-    function toggle() {
-        if (visible && expanded) close();
-        else open();
-    }
-    function open() {
-        hideTimer.stop();
-        slideOnClose = true;
+    onOpening: {
         if (!previous && !busy) message = "";
         refresh();
         if (!initialized && !stateQuery.running) stateQuery.running = true;
-        visible = true;
-        Qt.callLater(() => { expanded = true; content.forceActiveFocus(); });
     }
+    onDismissRequested: fade => close(fade)
     function dismissChoices() {
         monitorChoice.popup.close();
         resolutionChoice.popup.close();
         refreshChoice.popup.close();
     }
-    function hide() {
-        dismissChoices();
-        expanded = false;
-        hideTimer.interval = slideOnClose ? theme.notificationSlideDuration : 140;
-        hideTimer.restart();
-    }
     function close(fade = false) {
-        slideOnClose = !fade;
         closing = previous !== null;
-        hide();
+        dismissChoices();
+        hideAnimated(fade);
         if (previous && !busy) revert();
     }
     function run(command, kind) {
@@ -230,7 +207,6 @@ PopupWindow {
     onMonitorNameChanged: if (!previous && !busy) Qt.callLater(loadFields)
     Shortcut { sequence: "Escape"; enabled: panel.visible; onActivated: panel.close(true) }
     Shortcut { sequence: "F8"; enabled: panel.visible; onActivated: panel.close() }
-    Timer { id: hideTimer; interval: theme.notificationSlideDuration; onTriggered: panel.visible = false }
     Timer {
         id: temperatureTimer
         interval: 150
@@ -313,296 +289,160 @@ PopupWindow {
         }
     }
 
-    component LabelText: Text {
-        color: panel.colors.foreground
-        font.family: panel.theme.fontFamily
-        font.pixelSize: panel.theme.fontPixelSize
-        wrapMode: Text.WordWrap
-        Layout.fillWidth: true
-    }
-    component ActionButton: Button {
-        id: button
-        implicitHeight: 30
-        HoverHandler { cursorShape: button.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor }
-        leftPadding: 10; rightPadding: 10
-        font.family: panel.theme.fontFamily
-        font.pixelSize: panel.theme.fontPixelSize
-        background: Rectangle {
-            color: button.hovered || button.down || button.checked ? panel.colors.activeSurface : panel.colors.overlay
-            opacity: button.enabled ? 1 : 0.4
-        }
-        contentItem: Text {
-            text: button.text
-            font: button.font
-            color: button.hovered || button.down || button.checked ? panel.colors.activeForeground : panel.colors.foreground
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            opacity: button.enabled ? 1 : 0.4
-        }
-    }
-    component Field: TextField {
-        implicitHeight: 34
-        font.family: panel.theme.fontFamily
-        font.pixelSize: panel.theme.fontPixelSize
-        color: panel.colors.foreground
-        placeholderText: "Auto"
-        placeholderTextColor: panel.colors.mutedForeground
-        selectionColor: panel.colors.activeSurface
-        selectedTextColor: panel.colors.activeForeground
-        selectByMouse: true
-        padding: 8
-        background: Rectangle {
-            color: panel.colors.overlay
-            border.width: 1
-            border.color: parent.activeFocus ? panel.colors.foreground : panel.inputBorder
-        }
-    }
-    component Choice: ComboBox {
-        id: choice
-        property string hint: "Auto"
-        property string value: ""
-        property var options: []
-        model: ["Auto", ...options]
-        function setValue(next) {
-            value = next;
-            syncText();
-        }
-        function syncText() {
-            currentIndex = model.indexOf(value || "Auto");
-            editText = value || "Auto";
-        }
-        onActivated: index => setValue(index === 0 ? "" : model[index])
-        editable: true
-        implicitHeight: 34
-        font.family: panel.theme.fontFamily
-        font.pixelSize: panel.theme.fontPixelSize
-        leftPadding: 8; rightPadding: 28
-        contentItem: TextField {
-            text: choice.editText
-            onTextEdited: {
-                choice.editText = text;
-                choice.value = text.trim().toLowerCase() === "auto" ? "" : text;
-            }
-            font: choice.font
-            color: panel.colors.foreground
-            placeholderText: choice.hint
-            placeholderTextColor: panel.colors.mutedForeground
-            selectionColor: panel.colors.activeSurface
-            selectedTextColor: panel.colors.activeForeground
-            selectByMouse: true
-            padding: 0
-            readOnly: !choice.editable
-            background: null
-        }
-        indicator: Text {
-            x: choice.width - width - 8
-            anchors.verticalCenter: parent.verticalCenter
-            text: "v"
-            font: choice.font
-            color: panel.colors.foreground
-            HoverHandler { cursorShape: Qt.PointingHandCursor }
-        }
-        HoverHandler { cursorShape: choice.editable ? Qt.IBeamCursor : Qt.PointingHandCursor }
-        background: Rectangle {
-            color: panel.colors.overlay
-            border.width: 1
-            border.color: choice.activeFocus ? panel.colors.foreground : panel.inputBorder
-        }
-        delegate: ItemDelegate {
-            id: entry
-            required property var modelData
-            required property int index
-            width: choice.width
-            height: 32
-            HoverHandler { cursorShape: Qt.PointingHandCursor }
-            highlighted: choice.highlightedIndex === index
-            contentItem: Text {
-                text: entry.modelData
-                color: entry.highlighted ? panel.colors.activeForeground : panel.colors.foreground
-                font: choice.font
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-            }
-            background: Rectangle { color: entry.highlighted ? panel.colors.activeSurface : panel.colors.surface }
-        }
-        popup: Popup {
-            popupType: Popup.Item
-            x: 0
-            y: choice.height
-            margins: 0
-            width: choice.width
-            padding: 1
-            // Keep the list below its field; scroll instead of flipping it upward.
-            implicitHeight: Math.min(220, list.contentHeight + 2,
-                Math.max(0, panel.height - choice.mapToItem(panel.contentItem, 0, choice.height).y - 12))
-            background: Rectangle { color: panel.colors.surface; border.color: panel.inputBorder }
-            contentItem: ListView {
-                id: list
-                clip: true
-                implicitHeight: contentHeight
-                model: choice.popup.visible ? choice.delegateModel : null
-                currentIndex: choice.highlightedIndex
-                ScrollIndicator.vertical: ScrollIndicator {}
-            }
-        }
-        onModelChanged: Qt.callLater(syncText)
-        Component.onCompleted: syncText()
-    }
 
-    Rectangle {
-        width: parent.width
-        height: parent.height
-        y: panel.expanded || !panel.slideOnClose ? 0 : -height - 8
+    Flickable {
+        anchors.fill: parent
+        anchors.margins: theme.popupPadding
+        contentHeight: content.implicitHeight
         clip: true
-        color: panel.colors.surface
-        border.width: 1
-        border.color: panel.colors.border
-        opacity: panel.expanded ? 1 : 0
-        Behavior on y { NumberAnimation { duration: theme.notificationSlideDuration; easing.type: Easing.OutCubic } }
-        Behavior on opacity { NumberAnimation { duration: 140; easing.type: Easing.OutQuad } }
-        Flickable {
-            anchors.fill: parent
-            anchors.margins: 12
-            contentHeight: content.implicitHeight
-            clip: true
-            ColumnLayout {
-                id: content
-                width: parent.width
-                spacing: 10
-                focus: true
-                RowLayout {
-                    LabelText { text: "Display"; font.bold: true }
-                    Text {
-                        text: "󰅖"
-                        color: closeHover.hovered ? panel.colors.critical : panel.colors.mutedForeground
-                        font.family: panel.theme.fontFamily
-                        font.pixelSize: panel.theme.fontPixelSize + 2
-                        Layout.preferredWidth: 18
-                        Layout.preferredHeight: 30
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        HoverHandler { id: closeHover }
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: panel.close()
-                        }
+        ColumnLayout {
+            id: content
+            width: parent.width
+            spacing: 10
+            focus: true
+            RowLayout {
+                StyledText { theme: uiTheme; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: "Display"; font.bold: true }
+                StyledText {
+                    theme: uiTheme
+                    text: "󰅖"
+                    color: closeHover.hovered ? panel.colors.critical : panel.colors.mutedForeground
+                    font.pixelSize: panel.theme.fontPixelSize + 2
+                    Layout.preferredWidth: 18
+                    Layout.preferredHeight: 30
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    HoverHandler { id: closeHover }
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: panel.close()
                     }
                 }
-                RowLayout {
-                    LabelText { text: "Night light" }
-                    ActionButton {
-                        text: panel.nightTarget ? "On" : "Off"
-                        checked: panel.nightTarget
-                        enabled: panel.initialized
-                        onClicked: panel.setNight(!panel.nightTarget)
-                    }
+            }
+            RowLayout {
+                StyledText { theme: uiTheme; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: "Night light" }
+                ActionButton {
+                    theme: panel.theme
+                    text: panel.nightTarget ? "On" : "Off"
+                    checked: panel.nightTarget
+                    enabled: panel.initialized
+                    onClicked: panel.setNight(!panel.nightTarget)
                 }
-                RowLayout {
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+                Slider {
+                    id: warmth
+                    HoverHandler { cursorShape: warmth.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor }
                     Layout.fillWidth: true
-                    spacing: 12
-                    Slider {
-                        id: warmth
-                        HoverHandler { cursorShape: warmth.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor }
-                        Layout.fillWidth: true
-                        implicitHeight: 20
-                        enabled: panel.initialized
-                        from: 1000; to: 6500; stepSize: 100
-                        value: panel.temperature
-                        onMoved: {
-                            panel.temperature = Math.round(value);
-                            if (!pressed) temperatureTimer.restart();
-                        }
-                        onPressedChanged: if (!pressed && enabled) temperatureTimer.restart()
-                        background: Rectangle {
-                            x: warmth.leftPadding
-                            y: warmth.topPadding + warmth.availableHeight / 2 - height / 2
-                            width: warmth.availableWidth; height: 3
-                            color: panel.colors.border
-                            Rectangle { width: warmth.visualPosition * parent.width; height: parent.height; color: panel.colors.foreground }
-                        }
-                        handle: Rectangle {
-                            x: warmth.leftPadding + warmth.visualPosition * (warmth.availableWidth - width)
-                            y: warmth.topPadding + warmth.availableHeight / 2 - height / 2
-                            width: 10; height: 14
-                            color: panel.colors.foreground
-                        }
+                    implicitHeight: 20
+                    enabled: panel.initialized
+                    from: 1000; to: 6500; stepSize: 100
+                    value: panel.temperature
+                    onMoved: {
+                        panel.temperature = Math.round(value);
+                        if (!pressed) temperatureTimer.restart();
                     }
-                    LabelText {
-                        Layout.fillWidth: false
-                        Layout.preferredWidth: 64
-                        horizontalAlignment: Text.AlignRight
-                        text: panel.temperature + " K"
+                    onPressedChanged: if (!pressed && enabled) temperatureTimer.restart()
+                    background: Rectangle {
+                        x: warmth.leftPadding
+                        y: warmth.topPadding + warmth.availableHeight / 2 - height / 2
+                        width: warmth.availableWidth; height: 3
+                        color: panel.colors.border
+                        Rectangle { width: warmth.visualPosition * parent.width; height: parent.height; color: panel.colors.foreground }
+                    }
+                    handle: Rectangle {
+                        x: warmth.leftPadding + warmth.visualPosition * (warmth.availableWidth - width)
+                        y: warmth.topPadding + warmth.availableHeight / 2 - height / 2
+                        width: 10; height: 14
+                        color: panel.colors.foreground
                     }
                 }
-                Rectangle { Layout.fillWidth: true; height: 1; color: panel.colors.border }
-                Choice {
-                    id: monitorChoice
-                    Layout.fillWidth: true
-                    editable: false
-                    enabled: panel.canEdit
-                    options: panel.monitors.map(m => m.name)
+                StyledText { theme: uiTheme; wrapMode: Text.WordWrap;
+                    Layout.fillWidth: false
+                    Layout.preferredWidth: 64
+                    horizontalAlignment: Text.AlignRight
+                    text: panel.temperature + " K"
                 }
-                RowLayout {
+            }
+            Rectangle { Layout.fillWidth: true; height: 1; color: panel.colors.border }
+            Choice {
+                    theme: panel.theme
+                    viewport: panel.contentItem
+                id: monitorChoice
+                Layout.fillWidth: true
+                editable: false
+                enabled: panel.canEdit
+                options: panel.monitors.map(m => m.name)
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 8
-                    ColumnLayout {
+                    Layout.preferredWidth: 2
+                    StyledText { theme: uiTheme; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: "Resolution"; color: panel.colors.mutedForeground }
+                    Choice {
+                    theme: panel.theme
+                    viewport: panel.contentItem
+                        id: resolutionChoice
                         Layout.fillWidth: true
-                        Layout.preferredWidth: 2
-                        LabelText { text: "Resolution"; color: panel.colors.mutedForeground }
-                        Choice {
-                            id: resolutionChoice
-                            Layout.fillWidth: true
-                            enabled: panel.canEdit
-                            options: panel.resolutions
-                        }
-                    }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        LabelText { text: "Refresh Rate"; color: panel.colors.mutedForeground }
-                        Choice {
-                            id: refreshChoice
-                            Layout.fillWidth: true
-                            enabled: panel.canEdit
-                            options: panel.refreshRates
-                        }
+                        enabled: panel.canEdit
+                        options: panel.resolutions
                     }
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 6
-                    LabelText { text: "Scale"; color: panel.colors.mutedForeground }
-                    Field {
-                        id: scaleInput
+                    Layout.preferredWidth: 1
+                    StyledText { theme: uiTheme; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: "Refresh Rate"; color: panel.colors.mutedForeground }
+                    Choice {
+                    theme: panel.theme
+                    viewport: panel.contentItem
+                        id: refreshChoice
                         Layout.fillWidth: true
                         enabled: panel.canEdit
+                        options: panel.refreshRates
                     }
                 }
-                RowLayout {
-                    Layout.fillWidth: true
-                    Item { Layout.fillWidth: true }
-                    ActionButton {
-                        visible: !panel.previous
-                        text: "Apply"
-                        enabled: !!panel.monitor && panel.initialized && !monitorQuery.running && !panel.busy
-                        onClicked: panel.apply()
-                    }
-                    ActionButton {
-                        visible: !!panel.previous
-                        enabled: !panel.busy
-                        text: "Revert"
-                        onClicked: panel.revert()
-                    }
-                    ActionButton {
-                        visible: !!panel.previous
-                        enabled: !panel.busy
-                        text: "Keep (" + panel.secondsLeft + ")"
-                        onClicked: panel.keep()
-                    }
-                }
-                LabelText { visible: text !== ""; text: panel.message; color: panel.colors.critical }
             }
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 6
+                StyledText { theme: uiTheme; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: "Scale"; color: panel.colors.mutedForeground }
+                Field {
+                    theme: panel.theme
+                    id: scaleInput
+                    Layout.fillWidth: true
+                    enabled: panel.canEdit
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Item { Layout.fillWidth: true }
+                ActionButton {
+                    theme: panel.theme
+                    visible: !panel.previous
+                    text: "Apply"
+                    enabled: !!panel.monitor && panel.initialized && !monitorQuery.running && !panel.busy
+                    onClicked: panel.apply()
+                }
+                ActionButton {
+                    theme: panel.theme
+                    visible: !!panel.previous
+                    enabled: !panel.busy
+                    text: "Revert"
+                    onClicked: panel.revert()
+                }
+                ActionButton {
+                    theme: panel.theme
+                    visible: !!panel.previous
+                    enabled: !panel.busy
+                    text: "Keep (" + panel.secondsLeft + ")"
+                    onClicked: panel.keep()
+                }
+            }
+            StyledText { theme: uiTheme; Layout.fillWidth: true; wrapMode: Text.WordWrap; visible: text !== ""; text: panel.message; color: panel.colors.critical }
         }
     }
 }

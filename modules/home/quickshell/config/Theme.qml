@@ -24,6 +24,11 @@ QtObject {
     readonly property string fontFamily: "GoMono Nerd Font"
     readonly property int fontPixelSize: 14
 
+    readonly property int popupGap: 6
+    readonly property int popupPadding: 12
+    readonly property int surfaceRadius: 0
+    readonly property int fadeDuration: 140
+
     readonly property int barHeight: 25
     readonly property int pillHorizontalPadding: 22
     readonly property int workspaceHorizontalPadding: 14
@@ -43,6 +48,7 @@ QtObject {
         activeSurface: wallust.color7,
         activeForeground: wallust.color1,
         overlay: Qt.rgba(0, 0, 0, 0.18),
+        inputBorder: Qt.alpha(wallust.foreground, 0.25),
         border: Qt.lighter(Qt.darker(wallust.background, 1.5), 1.18),
         mutedForeground: Qt.rgba(wallust.foreground.r, wallust.foreground.g, wallust.foreground.b, 0.72),
         critical: "#D65D5D",
