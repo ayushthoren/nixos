@@ -10,9 +10,6 @@
     syntaxHighlighting.enable = true;
 
     shellAliases = {
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos#\${NIXOS_FLAKE_HOST}";
-      rebuild-test = "sudo nixos-rebuild test --flake ~/nixos#\${NIXOS_FLAKE_HOST}";
-      rebuild-boot = "sudo nixos-rebuild boot --flake ~/nixos#\${NIXOS_FLAKE_HOST}";
       rollback = "sudo nixos-rebuild --rollback switch --flake ~/nixos#\${NIXOS_FLAKE_HOST}";
       update = "nix flake update --flake ~/nixos";
       clean = "nh clean all -k 1";

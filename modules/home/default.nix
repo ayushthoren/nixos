@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ../../scripts
     ./theming.nix
     ./kitty
     ./hyprland
