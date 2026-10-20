@@ -17,5 +17,5 @@
   # Enable Hyprland performance mode (disables blur and shadow)
   home-manager.users.${username}.hyprland.performanceMode = true;
 
-  cachyosKernel.enable = "v3";
+  cachyosKernel.enable = true;
 }

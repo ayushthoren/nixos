@@ -10,18 +10,20 @@ let
 in
 {
   options.cachyosKernel = {
-    enable = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "v3" "v4" "zen4" ]);
-      default = null;
+    enable = lib.mkEnableOption "CachyOS kernel";
+
+    variant = lib.mkOption {
+      type = lib.types.enum [ "v3" "v4" "zen4" ];
+      default = "v3";
       description = "CachyOS kernel variants via nix-cachyos-kernel";
     };
   };
 
-  config = lib.mkIf (cfg.enable != null) {
+  config = lib.mkIf cfg.enable {
     nixpkgs.overlays = [
       inputs.nix-cachyos-kernel.overlays.pinned
     ];
 
-    boot.kernelPackages = kernelPackages.${cfg.enable};
+    boot.kernelPackages = kernelPackages.${cfg.variant};
   };
 }

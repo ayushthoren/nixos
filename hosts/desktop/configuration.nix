@@ -20,8 +20,11 @@
     NIXOS_FLAKE_HOST = "desktop";
   };
 
-  cachyosKernel.enable = "zen4";
-  secrets = true;
+  cachyosKernel = {
+    enable = true;
+    variant = "zen4";
+  };
+  secrets.enable = true;
   nvidia.enable = true;
   ollama.enable = true;
 

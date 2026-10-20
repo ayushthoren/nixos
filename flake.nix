@@ -1,5 +1,5 @@
 {
-  description = "NixOS + Home Manager setup with Hyprland";
+  description = "Thoren's NixOS flake";
 
   inputs = {
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -9,8 +9,6 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland-plugins = {

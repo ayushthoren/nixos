@@ -3,9 +3,9 @@
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];
 
-  options.secrets = lib.mkEnableOption "SOPS-managed secrets";
+  options.secrets.enable = lib.mkEnableOption "SOPS-managed secrets";
 
-  config = lib.mkIf config.secrets {
+  config = lib.mkIf config.secrets.enable {
     sops = {
       age.keyFile = "/etc/sops/age/keys.txt";
 

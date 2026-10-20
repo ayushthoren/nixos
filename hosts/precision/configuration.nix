@@ -1,12 +1,10 @@
 # Configuration for laptop with NVIDIA Dedicated Graphics (A2000 Mobile) & Intel Integrated Graphics
-{ lib, pkgs, inputs, username, ... }:
+{ lib, pkgs, username, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
     ./../../modules/core
-    # nixos-hardware for device-specific configurations, TLP is replaced by auto-cpufreq below
-    inputs.nixos-hardware.nixosModules.dell-precision-5560
   ];
 
   # Network hostname (can be anything)
@@ -20,15 +18,11 @@
     NIXOS_FLAKE_HOST = "precision";
   };
 
-  # Graphics configuration
-  
-  # boot.kernelParams = [
-  #   "i915.enable_psr=0"
-  #   "i915.enable_psr2_sel_fetch=0"
-  # ];
-
-  cachyosKernel.enable = "v4";
-  secrets = true;
+  cachyosKernel = {
+    enable = true;
+    variant = "v4";
+  };
+  secrets.enable = true;
   ollama.enable = true;
 
   # Default profile uses integrated-only for battery
@@ -57,13 +51,20 @@
 
   services.xserver.videoDrivers = [ "modesetting" ];
 
-  hardware.graphics.extraPackages = with pkgs; [
-    intel-media-driver
-    intel-compute-runtime
-    intel-vaapi-driver
-    libva-vdpau-driver
-    libvdpau-va-gl
-  ];
+  hardware.graphics = {
+    extraPackages = with pkgs; [
+      intel-media-driver
+      intel-compute-runtime
+      vpl-gpu-rt
+      intel-vaapi-driver
+      libva-vdpau-driver
+      libvdpau-va-gl
+    ];
+    extraPackages32 = [ pkgs.driversi686Linux.intel-media-driver ];
+  };
+
+  # Load Intel graphics early for the integrated display
+  boot.initrd.kernelModules = [ "i915" ];
 
   # Keep the dGPU driver stack unloaded in the default profile
   boot.blacklistedKernelModules = [
@@ -75,6 +76,9 @@
   ];
 
   boot.kernelParams = [
+    "i915.enable_guc=3"
+    # "i915.enable_psr=0"
+    # "i915.enable_psr2_sel_fetch=0"
     "module_blacklist=nouveau,nvidia,nvidia_drm,nvidia_modeset,nvidia_uvm"
   ];
 
