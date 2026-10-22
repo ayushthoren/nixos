@@ -416,3 +416,7 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 
 -- Auto-import is managed by the hyprland.performanceMode option in your flake
 require("imports")
+
+if os.getenv("NIXOS_FLAKE_HOST") == "spectre" then
+    hl.config({ quirks = { skip_non_kms_dmabuf_formats = false } })
+end

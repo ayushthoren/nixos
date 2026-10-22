@@ -21,24 +21,13 @@
   cachyosKernel.enable = true;
   secrets.enable = true;
 
-  legacyBootloader.enable = true;
-
   # Laptop power/thermal management
   powerManagement.enable = true;
-  # services.thermald.enable = true;
-  services.auto-cpufreq = {
-    enable = true;
-    settings = {
-      battery = {
-        governor = "powersave";
-        energy_performance_preference = "balance_power";
-        turbo = "never";
-      };
-      charger = {
-        governor = "powersave";
-        energy_performance_preference = "performance";
-        turbo = "auto";
-      };
-    };
-  };
+  services.thermald.enable = true;
+
+  # Disable turbo
+  systemd.tmpfiles.rules = [ "w /sys/devices/system/cpu/intel_pstate/no_turbo - - - - 1" ];
+
+  # Improve Synaptics touchpad handling
+  boot.extraModprobeConfig = "options psmouse synaptics_intertouch=1";
 }
