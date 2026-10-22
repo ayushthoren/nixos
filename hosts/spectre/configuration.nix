@@ -1,4 +1,4 @@
-# Configuration for HP Specre x360 2015 (No dedicated graphics or UEFI support)
+# Configuration for HP Spectre x360 2015 (13-4102dx)
 { username, ... }:
 
 {

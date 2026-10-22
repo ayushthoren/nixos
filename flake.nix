@@ -18,7 +18,7 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/master";
 
     sops-nix = {
       url = "github:Mic92/sops-nix";

@@ -12,6 +12,11 @@
       defaultSopsFile = ../../secrets/${hostname}.yaml;
 
       secrets.tailscale_oauth_secret = { sopsFile = ../../secrets/shared.yaml; };
+      secrets.cachix_auth_token = {
+        sopsFile = ../../secrets/shared.yaml;
+        owner = username;
+        mode = "0600";
+      };
       secrets.ssh_private_key = {
         owner = username;
         mode = "0600";

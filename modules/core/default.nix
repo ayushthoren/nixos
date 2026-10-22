@@ -4,7 +4,7 @@
     inputs.nix-flatpak.nixosModules.nix-flatpak
     ./audio.nix
     ./bootloader.nix
-    ./cachyos-kernel.nix
+    ./kernel
     ./locale.nix
     ./networking.nix
     ./secrets.nix
