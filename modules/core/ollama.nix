@@ -11,6 +11,7 @@ in
   config = lib.mkIf cfg.enable {
     services.ollama = {
       enable = true;
+      package = lib.mkIf (config.nvidia.enable or false) pkgs.ollama-cuda;
       modelsDir = "/var/lib/ollama/models";
       loadModels = [ "gemma3:1b" ];
     };
@@ -24,14 +25,6 @@ in
         ENABLE_WEB_SEARCH = "True";
         WEB_SEARCH_ENGINE = "duckduckgo";
       };
-    };
-    
-    environment.systemPackages = with pkgs; [
-      claude-code
-    ];
-    
-    environment.sessionVariables = {
-      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
     };
   };
 }

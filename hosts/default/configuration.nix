@@ -3,7 +3,9 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./../../modules/core
+    ../../modules/core
+    ../../modules/desktop
+    ../../home
   ];
 
   # Network hostname (can be anything)

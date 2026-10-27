@@ -1,19 +1,21 @@
-{ inputs, ... }:
+{ ... }:
 {
   imports = [
-    inputs.nix-flatpak.nixosModules.nix-flatpak
-    ./audio.nix
+    ../../scripts
     ./bootloader.nix
-    ./kernel
+    ./git.nix
+    ./kernel.nix
     ./locale.nix
     ./networking.nix
+    ./nix.nix
     ./secrets.nix
     ./ssh.nix
-    ./nvidia.nix
     ./ollama.nix
-    ./overlays.nix
+    ./containers.nix
+    ./development.nix
+    ./utilities.nix
+    ./memory.nix
     ./system.nix
     ./user.nix
-    ./wayland.nix
   ];
 }

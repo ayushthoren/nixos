@@ -7,7 +7,7 @@ let
   };
 in
 {
-  home.packages =
+  environment.systemPackages =
     map
       (
         name:

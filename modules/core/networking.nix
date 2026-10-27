@@ -3,8 +3,6 @@
 {
   networking.networkmanager.enable = true;
 
-  hardware.bluetooth.enable = true;
-
   services.resolved.enable = true;
 
   services.avahi = {
@@ -26,4 +24,6 @@
     enable = true;
     openFirewall = true;
   };
+
+  systemd.services.NetworkManager-wait-online.enable = false;
 }
