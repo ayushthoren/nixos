@@ -1,5 +1,9 @@
 { config, inputs, lib, pkgs, username, hostname, ... }:
 
+let
+  # Private repository
+  secretsRoot = (builtins.getFlake "github:ayushthoren/secrets/a90a6af98af4d79aabffbd9b5f5df0e88e5dca5c").outPath + "/secrets";
+in
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];
 
@@ -9,11 +13,11 @@
     sops = {
       age.keyFile = "/etc/sops/age/keys.txt";
 
-      defaultSopsFile = ../../secrets/${hostname}.yaml;
+      defaultSopsFile = secretsRoot + "/${hostname}.yaml";
 
-      secrets.tailscale_oauth_secret = { sopsFile = ../../secrets/shared.yaml; };
+      secrets.tailscale_oauth_secret = { sopsFile = secretsRoot + "/shared.yaml"; };
       secrets.cachix_auth_token = {
-        sopsFile = ../../secrets/shared.yaml;
+        sopsFile = secretsRoot + "/shared.yaml";
         owner = username;
         mode = "0600";
       };
@@ -45,7 +49,7 @@ Enroll a new host:
   sudo chmod 600 /etc/sops/age/keys.txt
   sudo age-keygen -y /etc/sops/age/keys.txt
 
-Add the printed age1... recipient to .sops.yaml and create a rule for
+In the secrets repository, add the printed age1... recipient to .sops.yaml and create a rule for
 secrets/<hostname>.yaml using *master and *<hostname>.
 
 2. Generate SSH key:

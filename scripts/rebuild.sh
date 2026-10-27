@@ -11,8 +11,13 @@ parse_remote_args 'Usage: rebuild[-test|-boot] [--remote [user@]host] [nixos-reb
 
 : "${NIXOS_FLAKE_HOST:?NIXOS_FLAKE_HOST must name the local flake configuration}"
 
+if github_token=$(gh auth token --hostname github.com 2>/dev/null); then
+  export NIX_CONFIG="${NIX_CONFIG-}"$'\n'"extra-access-tokens = github.com=$github_token"
+  unset github_token
+fi
+
 sudo -v
-rebuild_command=(sudo nixos-rebuild "$action")
+rebuild_command=(sudo --preserve-env=NIX_CONFIG nixos-rebuild "$action")
 
 if [[ -n "$remote_host" ]]; then
   # Keep sudo available during long remote builds, and stop refreshing on exit.

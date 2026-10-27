@@ -16,6 +16,6 @@ My [NixOS](https://nixos.org) configuration, utilizing [flakes](https://wiki.nix
 - Automatically generated theming from wallpapers
 - [Tailscale](https://tailscale.com) network connecting all of my devices together
 - Support for offloading heavy build tasks to any device
-- Encrypted secrets via [sops-nix](https://github.com/mic92/sops-nix)
+- Encrypted secrets via [sops-nix](https://github.com/mic92/sops-nix), stored in a private flake
 
 <sub>*A [thoren.co](https://thoren.co) innovation!*</sub>

@@ -12,6 +12,7 @@ in
       (
         name:
         command name [
+          pkgs.gh
           pkgs.nixos-rebuild
         ] ./rebuild.sh
       )
