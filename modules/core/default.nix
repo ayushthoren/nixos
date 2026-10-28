@@ -1,9 +1,10 @@
-{ ... }:
+{ username, ... }:
 {
+  home-manager.users.${username}.imports = [ ../../home/git.nix ];
+
   imports = [
     ../../scripts
     ./bootloader.nix
-    ./git.nix
     ./kernel.nix
     ./locale.nix
     ./networking.nix

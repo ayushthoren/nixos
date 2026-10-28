@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if ! declare -F parse_remote_args >/dev/null; then
+  # shellcheck source=/dev/null
+  source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+fi
+
 case "${0##*/}" in
   rebuild-test) action="test" ;;
   rebuild-boot) action="boot" ;;
@@ -11,13 +16,18 @@ parse_remote_args 'Usage: rebuild[-test|-boot] [--remote [user@]host] [nixos-reb
 
 : "${NIXOS_FLAKE_HOST:?NIXOS_FLAKE_HOST must name the local flake configuration}"
 
-if github_token=$(gh auth token --hostname github.com 2>/dev/null); then
+flake="$HOME/nixos#$NIXOS_FLAKE_HOST"
+evaluation_args=()
+unset NIXOS_SECRETS_USE_GITHUB
+if [[ ! -r /run/secrets/git_ssh_private_key ]] && github_token=$(gh auth token --hostname github.com 2>/dev/null); then
   export NIX_CONFIG="${NIX_CONFIG-}"$'\n'"extra-access-tokens = github.com=$github_token"
   unset github_token
+  export NIXOS_SECRETS_USE_GITHUB=1
+  evaluation_args+=(--impure)
 fi
 
 sudo -v
-rebuild_command=(sudo --preserve-env=NIX_CONFIG nixos-rebuild "$action")
+rebuild_command=(nixos-rebuild "$action" --sudo)
 
 if [[ -n "$remote_host" ]]; then
   # Keep sudo available during long remote builds, and stop refreshing on exit.
@@ -39,5 +49,9 @@ if [[ -n "$remote_host" ]]; then
   rebuild_command=(nixos-rebuild "$action" --sudo --build-host "$remote_host" --use-substitutes)
 fi
 
-"${rebuild_command[@]}" -L --log-format internal-json \
-  --flake "$HOME/nixos#$NIXOS_FLAKE_HOST" "${command_args[@]}" 2>&1 | monitor_build
+log_args=(-L)
+if command -v nom >/dev/null; then
+  log_args+=(--log-format internal-json)
+fi
+"${rebuild_command[@]}" "${log_args[@]}" \
+  --flake "$flake" "${evaluation_args[@]}" "${command_args[@]}" 2>&1 | monitor_build

@@ -1,8 +1,12 @@
 { config, inputs, lib, pkgs, username, hostname, ... }:
 
 let
-  # Private repository
-  secretsRoot = (builtins.getFlake "github:ayushthoren/secrets/a90a6af98af4d79aabffbd9b5f5df0e88e5dca5c").outPath + "/secrets";
+  revision = "dcd50215c6b20bd597c50f8cb4d1083deadce0d7";
+  # The `rebuild` command authenticates through the `gh` CLI during SSH bootstrap
+  source = if builtins.getEnv "NIXOS_SECRETS_USE_GITHUB" == "1"
+    then "github:ayushthoren/secrets/${revision}"
+    else "git+ssh://git@github.com/ayushthoren/secrets.git?ref=main&rev=${revision}";
+  secretsRoot = (builtins.getFlake source).outPath + "/secrets";
 in
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];
@@ -18,6 +22,12 @@ in
       secrets.tailscale_oauth_secret = { sopsFile = secretsRoot + "/shared.yaml"; };
       secrets.cachix_auth_token = {
         sopsFile = secretsRoot + "/shared.yaml";
+        owner = username;
+        mode = "0600";
+      };
+      secrets.git_ssh_private_key = {
+        sopsFile = secretsRoot + "/shared.yaml";
+        key = "ssh_private_key";
         owner = username;
         mode = "0600";
       };
