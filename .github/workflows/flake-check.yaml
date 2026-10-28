@@ -17,11 +17,16 @@ jobs:
     name: Check flake
     runs-on: ubuntu-latest
 
+    env:
+      NIXOS_SECRETS_USE_GITHUB: "1"
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
+        with:
+          github-token: ${{ secrets.SECRETS_REPO_TOKEN }}
 
       - name: Check flake
-        run: nix flake check --print-build-logs
+        run: nix flake check --impure --print-build-logs

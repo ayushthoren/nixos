@@ -23,6 +23,9 @@ jobs:
     name: Build hosts
     runs-on: ubuntu-latest
 
+    env:
+      NIXOS_SECRETS_USE_GITHUB: "1"
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,6 +42,8 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
+        with:
+          github-token: ${{ secrets.SECRETS_REPO_TOKEN }}
 
       - name: Load flake cache config
         run: |
@@ -50,7 +55,7 @@ jobs:
 
       - name: Build default host
         run: |
-          nix build \
+          nix build --impure \
             ".#nixosConfigurations.default.config.system.build.toplevel" \
             --show-trace \
             --print-build-logs \
@@ -69,7 +74,7 @@ jobs:
             fi
 
             echo "::group::Build ${host}"
-            nix build \
+            nix build --impure \
               ".#nixosConfigurations.${host}.config.system.build.toplevel" \
               --show-trace \
               --print-build-logs \
