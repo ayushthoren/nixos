@@ -1,7 +1,5 @@
 { pkgs, config, ... }:
 {
-  home.packages = [ pkgs.tirith ];
-
   programs.zsh = {
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";
@@ -40,7 +38,6 @@
         if [[ "$TERM" == "xterm-kitty" ]]; then
           fastfetch
         fi
-        eval "$(tirith init --shell zsh)"
       fi
     '';
     plugins = [
