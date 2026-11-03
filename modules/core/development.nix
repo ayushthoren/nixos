@@ -21,5 +21,7 @@
     gdb
   ];
 
+  services.usbmuxd.enable = true;
+
   environment.sessionVariables.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
 }

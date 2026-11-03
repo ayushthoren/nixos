@@ -3,6 +3,7 @@
   environment.systemPackages = with pkgs; [
     # Applications
     vscode-fhs
+    iloader
     spotify
     vesktop
     slack
