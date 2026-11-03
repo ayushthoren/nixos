@@ -10,6 +10,11 @@
     };
   };
 
+  programs.ssh.knownHosts."github.com" = {
+    hostNames = [ "github.com" "[ssh.github.com]:443" ];
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+  };
+
   # Add one plaintext Ed25519 public key per enrolled machine.
   users.users.${username}.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKFa9OqZ1ztSYSR6PWJ2vcyqGYY/moIDnsOiIDRmnwzd thoren@x"
