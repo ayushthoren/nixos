@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 {
   services.pipewire = {
     enable = true;
@@ -7,6 +7,9 @@
       enable = true;
       support32Bit = true;
     };
-    jack.enable = true;
   };
+
+  environment.systemPackages = with pkgs; [
+    pipewire.jack
+  ];
 }
